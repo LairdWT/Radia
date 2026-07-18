@@ -1,0 +1,5 @@
+{
+  "ps1": "pwsh -c Invoke-ScriptAnalyzer -Path <file>",
+  "rs": "cargo clippy --workspace --all-targets --all-features -- -D warnings",
+  "sh": "shellcheck <file>"
+}

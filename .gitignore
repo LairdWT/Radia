@@ -1,0 +1,6 @@
+Temp/
+.venv/
+target/
+node_modules/
+CLAUDE.local.md
+.claude/handoffs/

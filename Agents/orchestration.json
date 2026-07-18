@@ -1,0 +1,31 @@
+{
+  "allowedRuntimes": ["claude", "codex"],
+  "capabilities": {
+    "architecture": "aep-agent-architect",
+    "diagnosis": "aep-agent-debugger",
+    "gate-run": "aep-agent-runner",
+    "implementation": "aep-agent-implementer",
+    "research": "aep-agent-researcher",
+    "surgical": "aep-agent-surgical-editor",
+    "verification": "aep-agent-verifier"
+  },
+  "controlPlane": {
+    "compatibilityWorker": "aep-agent-executor",
+    "director": null,
+    "orchestrator": "aep-agent-orchestrator"
+  },
+  "defaultProfile": null,
+  "runtimeDefaults": {
+    "claude": {
+      "effort": "xhigh",
+      "model": "claude-opus-4-8[1m]"
+    },
+    "codex": {
+      "effort": "xhigh",
+      "model": "gpt-5.6-sol"
+    }
+  },
+  "schemaVersion": "0.2",
+  "setSlug": "agent-set:aep",
+  "source": "project-local"
+}

@@ -1,0 +1,117 @@
+{
+  "glsl": {
+    "bundle": "graphics",
+    "reason": "curated graphics skills for this file type; audit changed code with graphics-audit",
+    "skills": [
+      "hlsl-core",
+      "graphics-audit",
+      "glsl",
+      "hlsl-vs-glsl-porting",
+      "hlsl-semantics-and-registers"
+    ]
+  },
+  "hlsl": {
+    "bundle": "graphics",
+    "reason": "curated graphics skills for this file type; audit changed code with graphics-audit",
+    "skills": [
+      "hlsl-core",
+      "graphics-audit",
+      "glsl",
+      "hlsl-vs-glsl-porting",
+      "hlsl-semantics-and-registers"
+    ]
+  },
+  "hlsli": {
+    "bundle": "graphics",
+    "reason": "curated graphics skills for this file type; audit changed code with graphics-audit",
+    "skills": [
+      "hlsl-core",
+      "graphics-audit",
+      "glsl",
+      "hlsl-vs-glsl-porting",
+      "hlsl-semantics-and-registers"
+    ]
+  },
+  "ps1": {
+    "bundle": "powershell",
+    "reason": "curated powershell skills for this file type; audit changed code with powershell-audit",
+    "skills": [
+      "powershell-core",
+      "powershell-audit",
+      "powershell-error-handling",
+      "powershell-strings-and-quoting",
+      "powershell-testing-pester"
+    ]
+  },
+  "rs": {
+    "bundle": "rust",
+    "reason": "curated rust skills for this file type; audit changed code with rust-audit",
+    "skills": [
+      "rust-core",
+      "rust-audit",
+      "rust-error-handling-result-and-question-mark",
+      "rust-testing-and-doctests",
+      "rust-ownership-and-borrowing",
+      "rust-clippy-and-rustfmt"
+    ]
+  },
+  "sh": {
+    "bundle": "shell",
+    "reason": "curated shell skills for this file type; audit changed code with shell-audit",
+    "skills": [
+      "shell-core",
+      "shell-audit",
+      "shell-error-handling",
+      "shell-quoting-and-expansion",
+      "shell-shellcheck"
+    ]
+  },
+  "usf": {
+    "bundle": "graphics",
+    "reason": "curated graphics skills for this file type; audit changed code with graphics-audit",
+    "skills": [
+      "hlsl-core",
+      "graphics-audit",
+      "glsl",
+      "hlsl-vs-glsl-porting",
+      "hlsl-semantics-and-registers"
+    ]
+  },
+  "ush": {
+    "bundle": "graphics",
+    "reason": "curated graphics skills for this file type; audit changed code with graphics-audit",
+    "skills": [
+      "hlsl-core",
+      "graphics-audit",
+      "glsl",
+      "hlsl-vs-glsl-porting",
+      "hlsl-semantics-and-registers"
+    ]
+  },
+  "yaml": {
+    "bundle": "ops",
+    "reason": "curated ops skills for this file type; audit changed code with ops-audit",
+    "skills": [
+      "ops-core",
+      "ops-audit",
+      "dockerfile-authoring",
+      "compose-orchestration",
+      "image-hygiene",
+      "ci-workflow-authoring",
+      "ci-secrets-hygiene"
+    ]
+  },
+  "yml": {
+    "bundle": "ops",
+    "reason": "curated ops skills for this file type; audit changed code with ops-audit",
+    "skills": [
+      "ops-core",
+      "ops-audit",
+      "dockerfile-authoring",
+      "compose-orchestration",
+      "image-hygiene",
+      "ci-workflow-authoring",
+      "ci-secrets-hygiene"
+    ]
+  }
+}

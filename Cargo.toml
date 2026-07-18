@@ -1,0 +1,22 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/radia-demo",
+    "crates/radia-math",
+    "crates/radia-render",
+]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95"
+license = "Apache-2.0"
+repository = "https://github.com/LairdWT/Radia"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+module_name_repetitions = "allow"
+

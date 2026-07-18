@@ -1,0 +1,76 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "agent-code-skills lint-hook",
+            "type": "command"
+          },
+          {
+            "command": "agent-code-skills skill-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "agent-code-skills handoff emit --quiet",
+            "type": "command"
+          },
+          {
+            "command": "agent-code-skills handoff doctrine",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "agent-code-skills guard",
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "agent-code-skills handoff sync",
+            "type": "command"
+          },
+          {
+            "command": "agent-code-skills orient",
+            "type": "command"
+          },
+          {
+            "command": "agent-code-skills handoff latest",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "agent-code-skills adr check --target .",
+            "type": "command"
+          },
+          {
+            "command": "agent-code-skills verify-reminder",
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}

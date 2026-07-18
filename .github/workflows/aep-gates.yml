@@ -1,0 +1,22 @@
+name: aep-gates
+on:
+  push:
+  pull_request:
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # ADR log + convention pins need the aep library tooling; clone and
+      # build it, then run both checks against this repository.
+      - name: fetch aep library
+        run: git clone --depth 1 https://github.com/LairdWT/agent-enhanced-project ../aep-library
+      - uses: dtolnay/rust-toolchain@stable
+      - name: build aep tools
+        run: cargo build --manifest-path ../aep-library/tools/Cargo.toml --release
+      - name: adr-log
+        run: ../aep-library/tools/target/release/agent-code-skills adr check --target .
+      - name: pin-drift
+        run: ../aep-library/tools/target/release/agent-code-skills pins --check . --repo ../aep-library
+      - name: verify
+        run: cargo test --workspace --all-features
