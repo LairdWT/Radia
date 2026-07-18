@@ -1,0 +1,131 @@
+{
+  "baseline": {
+    "camera": "right-handed active pose; real=(1,0,0,0) wxyz; translation=(0,0.6,4.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=1; mode=Radia; 320x180; 1024 samples; hammersley-cp-v1-1024",
+    "dimensions": {
+      "height": 180,
+      "width": 320
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 1023,
+      "tick": "hammersley-cp-v1-1024"
+    },
+    "path": "run-1/radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 320 --height 180 --samples 1024 --output-dir Temp/evidence/run-1",
+    "revision": "25278ed1a5e0a18161d635fcfdd5ba90c0487f4f",
+    "sha256": "889628a04fa663f200d79bdc06a70ce36ab1fd53dab551f99266df71eac40442",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "320x180; top-left origin; pixel centers n+0.5"
+  },
+  "candidate": {
+    "camera": "right-handed active pose; real=(1,0,0,0) wxyz; translation=(0,0.6,4.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=2; mode=Radia; 320x180; 1024 samples; hammersley-cp-v1-1024",
+    "dimensions": {
+      "height": 180,
+      "width": 320
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 1023,
+      "tick": "hammersley-cp-v1-1024"
+    },
+    "path": "run-2/radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 320 --height 180 --samples 1024 --output-dir Temp/evidence/run-2",
+    "revision": "25278ed1a5e0a18161d635fcfdd5ba90c0487f4f",
+    "sha256": "889628a04fa663f200d79bdc06a70ce36ab1fd53dab551f99266df71eac40442",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "320x180; top-left origin; pixel centers n+0.5"
+  },
+  "comparison": {
+    "absoluteTolerance": 0.0,
+    "channels": [
+      {
+        "baselineChannel": "R",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "R",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "G",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "G",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "B",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "B",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "A",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "A",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      }
+    ],
+    "comparedPixels": 57600,
+    "differingPixels": 0,
+    "differingRatio": 0.0,
+    "maskPath": null,
+    "maxDifferingPixels": 0,
+    "maxDifferingRatio": 0.0,
+    "mismatchBounds": null,
+    "mode": "exact",
+    "nonFinite": "reject",
+    "relativeTolerance": 0.0
+  },
+  "decodedSampleEquality": true,
+  "evidenceId": "radia-mvp-determinism-rtx4070",
+  "fileHashEquality": true,
+  "policy": {
+    "classification": "public",
+    "transmission": "allowed"
+  },
+  "purpose": "acceptance",
+  "schemaVersion": "1.0",
+  "verdict": "pass"
+}

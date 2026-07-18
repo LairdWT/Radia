@@ -1,0 +1,104 @@
+{
+  "alphaCoverage": 1.0,
+  "capture": "baseline",
+  "channelCount": 4,
+  "channels": [
+    {
+      "finiteCount": 57600,
+      "maximum": 0.6235294117647059,
+      "mean": 0.49203499455297206,
+      "minimum": 0.16470588235294117,
+      "name": "R",
+      "nanCount": 0,
+      "negativeInfinityCount": 0,
+      "percentiles": {
+        "p0": 0.16470588235294117,
+        "p1": 0.27450980392156865,
+        "p100": 0.6235294117647059,
+        "p5": 0.43529411764705883,
+        "p50": 0.43529411764705883,
+        "p95": 0.6,
+        "p99": 0.6
+      },
+      "positiveInfinityCount": 0,
+      "sampleCount": 57600,
+      "sampleType": "u8",
+      "suspiciousRanges": []
+    },
+    {
+      "finiteCount": 57600,
+      "maximum": 0.592156862745098,
+      "mean": 0.5014027777777266,
+      "minimum": 0.08235294117647059,
+      "name": "G",
+      "nanCount": 0,
+      "negativeInfinityCount": 0,
+      "percentiles": {
+        "p0": 0.08235294117647059,
+        "p1": 0.3176470588235294,
+        "p100": 0.592156862745098,
+        "p5": 0.4549019607843137,
+        "p50": 0.4549019607843137,
+        "p95": 0.592156862745098,
+        "p99": 0.592156862745098
+      },
+      "positiveInfinityCount": 0,
+      "sampleCount": 57600,
+      "sampleType": "u8",
+      "suspiciousRanges": []
+    },
+    {
+      "finiteCount": 57600,
+      "maximum": 0.5725490196078431,
+      "mean": 0.5095625000002874,
+      "minimum": 0.06666666666666667,
+      "name": "B",
+      "nanCount": 0,
+      "negativeInfinityCount": 0,
+      "percentiles": {
+        "p0": 0.06666666666666667,
+        "p1": 0.27450980392156865,
+        "p100": 0.5725490196078431,
+        "p5": 0.47843137254901963,
+        "p50": 0.47843137254901963,
+        "p95": 0.5725490196078431,
+        "p99": 0.5725490196078431
+      },
+      "positiveInfinityCount": 0,
+      "sampleCount": 57600,
+      "sampleType": "u8",
+      "suspiciousRanges": []
+    },
+    {
+      "finiteCount": 57600,
+      "maximum": 1.0,
+      "mean": 1.0,
+      "minimum": 1.0,
+      "name": "A",
+      "nanCount": 0,
+      "negativeInfinityCount": 0,
+      "percentiles": {
+        "p0": 1.0,
+        "p1": 1.0,
+        "p100": 1.0,
+        "p5": 1.0,
+        "p50": 1.0,
+        "p95": 1.0,
+        "p99": 1.0
+      },
+      "positiveInfinityCount": 0,
+      "sampleCount": 57600,
+      "sampleType": "u8",
+      "suspiciousRanges": []
+    }
+  ],
+  "dimensions": {
+    "height": 180,
+    "width": 320
+  },
+  "evidenceId": "radia-mvp-controlled-delta-rtx4070",
+  "format": "png",
+  "pixelFormat": "rgba8",
+  "schemaVersion": "1.0",
+  "sha256": "37f5919000265d9b13925a55dd8fc55f637fa8aac1a459c41cef05044448c448"
+}

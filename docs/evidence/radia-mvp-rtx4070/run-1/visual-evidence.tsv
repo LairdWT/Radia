@@ -1,0 +1,17 @@
+field	value
+contract	adr:deterministic-visual-evidence-contract
+backend	Vulkan
+adapter	NVIDIA GeForce RTX 4070 Laptop GPU
+driver	NVIDIA
+size	320x180
+samples	1024
+sequence	hammersley-cp-v1-1024
+off_sha256	37f5919000265d9b13925a55dd8fc55f637fa8aac1a459c41cef05044448c448
+radia_sha256	889628a04fa663f200d79bdc06a70ce36ab1fd53dab551f99266df71eac40442
+control_signature	888b180da8ea705087e7630be8f9994b0368165cb53e6eb76916a56a80b6607e
+emitter_offscreen	true
+receiver_roi	40,90,280,180
+maximum_channel_delta	100
+mean_channel_delta	3.794012
+changed_pixels	8653
+threshold	4

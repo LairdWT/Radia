@@ -1,0 +1,79 @@
+{
+  "baseline": {
+    "camera": "right-handed active pose; real=(1,0,0,0) wxyz; translation=(0,0.6,4.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=1; mode=Radia; 320x180; 1024 samples; hammersley-cp-v1-1024",
+    "dimensions": {
+      "height": 180,
+      "width": 320
+    },
+    "format": "png",
+    "frame": {
+      "index": 1023,
+      "tick": "hammersley-cp-v1-1024"
+    },
+    "path": "run-1/radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 320 --height 180 --samples 1024 --output-dir Temp/evidence/run-1",
+    "revision": "25278ed1a5e0a18161d635fcfdd5ba90c0487f4f",
+    "sha256": "889628a04fa663f200d79bdc06a70ce36ab1fd53dab551f99266df71eac40442",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "320x180; top-left origin; pixel centers n+0.5"
+  },
+  "candidate": {
+    "camera": "right-handed active pose; real=(1,0,0,0) wxyz; translation=(0,0.6,4.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=2; mode=Radia; 320x180; 1024 samples; hammersley-cp-v1-1024",
+    "dimensions": {
+      "height": 180,
+      "width": 320
+    },
+    "format": "png",
+    "frame": {
+      "index": 1023,
+      "tick": "hammersley-cp-v1-1024"
+    },
+    "path": "run-2/radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 320 --height 180 --samples 1024 --output-dir Temp/evidence/run-2",
+    "revision": "25278ed1a5e0a18161d635fcfdd5ba90c0487f4f",
+    "sha256": "889628a04fa663f200d79bdc06a70ce36ab1fd53dab551f99266df71eac40442",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "320x180; top-left origin; pixel centers n+0.5"
+  },
+  "comparison": {
+    "absoluteTolerance": 0.0,
+    "channels": [
+      { "baseline": "R", "candidate": "R" },
+      { "baseline": "G", "candidate": "G" },
+      { "baseline": "B", "candidate": "B" },
+      { "baseline": "A", "candidate": "A" }
+    ],
+    "maxDifferingPixels": 0,
+    "maxDifferingRatio": 0.0,
+    "mode": "exact",
+    "nonFinite": "reject",
+    "relativeTolerance": 0.0
+  },
+  "evidenceId": "radia-mvp-determinism-rtx4070",
+  "policy": {
+    "classification": "public",
+    "transmission": "allowed"
+  },
+  "preview": {
+    "alpha": "A",
+    "blue": "B",
+    "exposure": 0.0,
+    "green": "G",
+    "maximum": 1.0,
+    "minimum": 0.0,
+    "red": "R",
+    "toneMap": "clamp"
+  },
+  "purpose": "acceptance",
+  "schemaVersion": "1.0"
+}
