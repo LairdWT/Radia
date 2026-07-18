@@ -186,6 +186,13 @@ $env:RADIA_ADAPTER_NAME = 'AMD'
 cargo test -p radia-render --test vulkan_capture -- --ignored --nocapture
 ```
 
+The AEP library is currently private. GitHub Actions always runs the Rust and
+matrix gates; ADR and pin checks additionally run when the repository has an
+`AEP_REPO_TOKEN` secret with read access to the pinned AEP commit. Without that
+secret, CI emits a notice instead of pretending that cross-repository access
+worked. The committed build log and fresh-clone rehearsal run those AEP checks
+locally against the exact pinned library.
+
 ## How AEP and Codex were used
 
 Radia began as a blank directory. AEP generated the repository contract,

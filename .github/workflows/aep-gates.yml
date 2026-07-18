@@ -10,22 +10,32 @@ permissions:
 jobs:
   gates:
     runs-on: ubuntu-24.04
+    env:
+      HAS_AEP_REPO_TOKEN: ${{ secrets.AEP_REPO_TOKEN != '' }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: fetch pinned aep library
+        if: env.HAS_AEP_REPO_TOKEN == 'true'
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: LairdWT/agent-enhanced-project
           ref: 8987e46caddd2f441703db1fc0c2e688ad6df92b
           path: _aep-library
+          token: ${{ secrets.AEP_REPO_TOKEN }}
       - name: install Rust toolchain
         run: rustup toolchain install 1.95.0 --profile minimal --component clippy,rustfmt
       - name: build aep tools
+        if: env.HAS_AEP_REPO_TOKEN == 'true'
         run: cargo build --manifest-path _aep-library/tools/Cargo.toml --release
       - name: adr-log
+        if: env.HAS_AEP_REPO_TOKEN == 'true'
         run: _aep-library/tools/target/release/agent-code-skills adr check --target .
       - name: pin-drift
+        if: env.HAS_AEP_REPO_TOKEN == 'true'
         run: _aep-library/tools/target/release/agent-code-skills pins --check . --repo _aep-library
+      - name: explain unavailable private-library gates
+        if: env.HAS_AEP_REPO_TOKEN != 'true'
+        run: echo "::notice title=AEP consumer gates::Set the AEP_REPO_TOKEN repository secret to run ADR and pin checks against the pinned private AEP library. Rust and matrix gates remain mandatory."
       - name: format
         run: cargo fmt --all -- --check
       - name: clippy
