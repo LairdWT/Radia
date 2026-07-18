@@ -1,7 +1,18 @@
-//! Vulkan-backed, matrix-free rendering for Radia.
+//! Vulkan-only WGPU renderer for Radia.
 
-/// Confirms the renderer crate and math crate are linked.
-#[must_use]
-pub const fn crate_ready() -> bool {
-    true
-}
+mod capture;
+mod error;
+mod evidence;
+mod executor;
+mod renderer;
+mod sdf;
+mod sha256;
+
+pub use capture::{CaptureConfig, CaptureReport, capture_png};
+pub use error::RenderError;
+pub use evidence::{EvidenceConfig, EvidenceReport, ReceiverRoi, capture_controlled_delta};
+pub use executor::block_on;
+pub use renderer::{RadiaMode, RadiaRenderer, RenderSettings, default_render_settings};
+pub use sdf::{
+    CpuSdfScene, CpuTraceConfig, CpuTraceResult, SdfMaterial, SdfSample, TraceTermination,
+};

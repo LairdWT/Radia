@@ -7,8 +7,10 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+radia-math = { path = "../radia-math" }
 radia-render = { path = "../radia-render" }
+wgpu.workspace = true
+winit.workspace = true
 
 [lints]
 workspace = true
-
