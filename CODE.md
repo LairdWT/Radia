@@ -18,7 +18,14 @@ Library: agent-enhanced-project
 
 ## Project deviations and additions
 
-- (none yet; add one line per deviation with its adr:<slug>)
+- Only `*-core` routers load by default; spokes load only when routed by the
+  smallest active unit.
+- Matrix types and non-rigid runtime transforms are forbidden in v1
+  (`adr:coordinate-and-dual-quaternion-semantics`).
+- Projection is analytic, infinite-far, WGPU zero-to-one reverse-Z
+  (`adr:matrix-free-reverse-z-projection`).
+- Third-party additions are limited to the exact accepted WGPU, Winit, and PNG
+  set (`adr:wgpu-vulkan-dependency-set`).
 
 ## Toolchain configs are law
 
