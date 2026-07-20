@@ -330,7 +330,7 @@ mod tests {
 
     #[test]
     fn source_contract_keeps_cpu_and_wgsl_limits_aligned() {
-        let shader = include_str!("shaders/scene.wgsl");
+        let shader = include_str!("shaders/scene.wgsl").replace("\r\n", "\n");
         assert!(shader.contains("world_point.y + 1.0"));
         assert!(shader.contains("world_point.z + 8.0"));
         assert!(shader.contains("@group(0) @binding(1) var<storage, read> dragon_field"));
