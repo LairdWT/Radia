@@ -2,10 +2,11 @@
 
 This is a local drafting aid for existing project `1345054`, **Agent Enhanced
 Projects (AEPs)**. On 2026-07-18 the owner authorized a remote project-page
-update. Devpost version 7 now contains the verified quaternion-deferred dragon,
-buffer-inspection, conservative UDF curtain-fix, and banding-fix progress,
-qualified as current
-working-tree work until governed publication. The project page reports
+update. Devpost version 7 contains the verified quaternion-deferred dragon,
+buffer-inspection, conservative UDF curtain-fix, and banding-fix progress. That
+remote text was qualified as working-tree work at the time. The complete
+governed renderer, triad presentation, and evidence are now recorded in Radia
+commit `21234cfb19e7fd2b2d630ccff9b52df52685a577`. The project page reports
 `published`. No video was added and no hackathon submission operation was
 called.
 
@@ -15,9 +16,9 @@ rewrite it personally, review every claim, and only then approve an update.
 
 ## Published version 7 Radia source text
 
-The following facts describe the current local working tree and were sent to
-Devpost with an explicit working-tree qualification because they are not yet on
-public main.
+The following facts describe the governed Radia publication commit. An earlier
+subset was sent to Devpost version 7 with an explicit working-tree
+qualification.
 
 During Build Week I created Radia from a blank repository as a reproducible
 downstream test of AEP. Radia is a Rust 1.95/WGPU renderer that uses normalized
