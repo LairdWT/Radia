@@ -2,9 +2,9 @@
 id: be81c17f-89d4-4cab-b103-74c8723572e5
 slug: adr:source-lineage-and-clean-room-boundary
 title: Source lineage and clean-room boundary
-status: accepted
+status: superseded
 supersedes: []
-supersededBy: null
+supersededBy: adr:public-dragon-asset-lineage-boundary
 deciders: ["LairdWT"]
 proposedAt: 2026-07-18
 decidedAt: 2026-07-18

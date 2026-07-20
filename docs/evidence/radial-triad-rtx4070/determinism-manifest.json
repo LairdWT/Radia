@@ -1,0 +1,64 @@
+{
+  "baseline": {
+    "camera": "right-handed active pose; identity rotation; translation=(0,0.15,0.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=1; mode=Radia; 640x360; scene_time_seconds=0; three radial dragon poses; three analytic lights",
+    "dimensions": { "height": 360, "width": 640 },
+    "format": "png",
+    "frame": { "index": 0, "tick": "scene-time-0" },
+    "path": "radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/radial-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "dbfa5fd9172ea5f4e4a779d7a4b785648d09004dbfc55497294096238e428330",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "candidate": {
+    "camera": "right-handed active pose; identity rotation; translation=(0,0.15,0.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=2; mode=Radia; 640x360; scene_time_seconds=0; three radial dragon poses; three analytic lights",
+    "dimensions": { "height": 360, "width": 640 },
+    "format": "png",
+    "frame": { "index": 0, "tick": "scene-time-0" },
+    "path": "radia-on-repeat.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/radial-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "dbfa5fd9172ea5f4e4a779d7a4b785648d09004dbfc55497294096238e428330",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "comparison": {
+    "absoluteTolerance": 0.0,
+    "channels": [
+      { "baseline": "R", "candidate": "R" },
+      { "baseline": "G", "candidate": "G" },
+      { "baseline": "B", "candidate": "B" },
+      { "baseline": "A", "candidate": "A" }
+    ],
+    "maxDifferingPixels": 0,
+    "maxDifferingRatio": 0.0,
+    "mode": "exact",
+    "nonFinite": "reject",
+    "relativeTolerance": 0.0
+  },
+  "evidenceId": "radia-radial-triad-determinism-rtx4070",
+  "policy": { "classification": "public", "transmission": "allowed" },
+  "preview": {
+    "alpha": "A",
+    "blue": "B",
+    "exposure": 0.0,
+    "green": "G",
+    "maximum": 1.0,
+    "minimum": 0.0,
+    "red": "R",
+    "toneMap": "clamp"
+  },
+  "purpose": "acceptance",
+  "schemaVersion": "1.0"
+}

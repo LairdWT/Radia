@@ -1,0 +1,24 @@
+field	value
+contract	adr:spatially-phased-and-edge-resolved-deferred-radia
+udf_domain_contract	adr:conservative-sampled-udf-domain-extension
+backend	Vulkan
+adapter	NVIDIA GeForce RTX 4070 Laptop GPU
+driver	NVIDIA
+size	640x360
+gi_method	screen-space-irradiance-v3
+gather_taps	32
+phase_tile	4x4
+resolve_kernel	5x5-edge-aware
+dragon_field_sha256	9a8babdacdab6dbc3b8789b5008bbbaee4c58c7ffea42183ada83397d5cb3862
+light_count	3
+lights	red=(-2.7,1.35,-3.2);green=(2.6,1.75,-3.6);blue=(0.1,3.0,-5.6)
+off_sha256	433feb81a943d6f91b57627c9040b61dc579015920aa1373b899bab500f9882a
+radia_sha256	82eed7eae4bb7ad841a67b23317f74048bbac1c45af397f222519ad14a211c7c
+radia_repeat_sha256	82eed7eae4bb7ad841a67b23317f74048bbac1c45af397f222519ad14a211c7c
+fixed_state_hashes_match	true
+control_signature	bfbc7293ad36e4f2616b044b60be5c6f3c91e8f902507d11542f1e3007be4312
+receiver_roi	80,180,560,360
+maximum_channel_delta	108
+mean_channel_delta	5.017917
+changed_pixels	34847
+threshold	4

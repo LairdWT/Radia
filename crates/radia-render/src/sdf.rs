@@ -85,7 +85,7 @@ impl CpuSdfScene {
         closest = closer(
             closest,
             SdfSample {
-                distance: world_point.z + 7.0,
+                distance: world_point.z + 8.0,
                 material: SdfMaterial::Wall,
             },
         );
@@ -270,7 +270,8 @@ mod tests {
 
     fn scene() -> CpuSdfScene {
         let settings = default_render_settings(RadiaMode::Off).expect("frozen settings are valid");
-        CpuSdfScene::courtyard(settings.emitter_position, settings.emitter_radius)
+        let primary_light = settings.lights[0];
+        CpuSdfScene::courtyard(primary_light.position, primary_light.radius)
             .expect("frozen scene is valid")
     }
 
@@ -329,11 +330,17 @@ mod tests {
 
     #[test]
     fn source_contract_keeps_cpu_and_wgsl_limits_aligned() {
-        let shader = include_str!("shaders/radia.wgsl");
+        let shader = include_str!("shaders/scene.wgsl");
         assert!(shader.contains("world_point.y + 1.0"));
-        assert!(shader.contains("world_point.z + 7.0"));
-        assert!(shader.contains("vec3<f32>(1.25, 0.0, -4.6)"));
+        assert!(shader.contains("world_point.z + 8.0"));
+        assert!(shader.contains("@group(0) @binding(1) var<storage, read> dragon_field"));
+        assert!(shader.contains("dragon_index < 3u"));
+        assert!(shader.contains("dragon_safe_distance(world_point, dragon_index)"));
+        assert!(shader.contains("dragon_material(dragon_index),\n                dragon_index"));
+        assert!(shader.contains("light_index < 3u"));
         assert!(shader.contains("step < 128u"));
         assert!(shader.contains("abs(sample.distance) <= hit_guard"));
+        assert!(shader.contains("max(outside_distance, sampled_distance - outside_distance)"));
+        assert!(!shader.contains("max(outside_distance, 2.0 * frame.dragon_minimum_error.w)"));
     }
 }

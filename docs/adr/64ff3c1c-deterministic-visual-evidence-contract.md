@@ -2,9 +2,9 @@
 id: 64ff3c1c-c174-4bb4-89f5-c84835f6b255
 slug: adr:deterministic-visual-evidence-contract
 title: Deterministic visual evidence contract
-status: accepted
+status: superseded
 supersedes: []
-supersededBy: null
+supersededBy: adr:three-light-dragon-visual-evidence-contract
 deciders: ["LairdWT"]
 proposedAt: 2026-07-18
 decidedAt: 2026-07-18

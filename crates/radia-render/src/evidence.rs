@@ -2,8 +2,7 @@ use std::fs;
 use std::io::BufReader;
 use std::path::PathBuf;
 
-use radia_math::ReverseZPerspective;
-
+use crate::dragon::DRAGON_FIELD_SHA256;
 use crate::renderer::{RadiaMode, RenderSettings, default_render_settings};
 use crate::sha256::digest_hex;
 use crate::{CaptureConfig, CaptureReport, RenderError, capture_png};
@@ -12,7 +11,6 @@ use crate::{CaptureConfig, CaptureReport, RenderError, capture_png};
 pub struct EvidenceConfig {
     pub width: u32,
     pub height: u32,
-    pub samples: u32,
     pub output_directory: PathBuf,
 }
 
@@ -28,21 +26,22 @@ pub struct ReceiverRoi {
 pub struct EvidenceReport {
     pub off_capture: CaptureReport,
     pub radia_capture: CaptureReport,
+    pub radia_repeat_capture: CaptureReport,
     pub manifest_path: PathBuf,
     pub receiver_roi: ReceiverRoi,
     pub maximum_channel_delta: u8,
     pub mean_channel_delta: f64,
     pub changed_pixels: u64,
     pub control_signature: String,
-    pub emitter_offscreen: bool,
+    pub light_count: u32,
 }
 
 struct ManifestData<'a> {
     config: &'a EvidenceConfig,
     off_capture: &'a CaptureReport,
     radia_capture: &'a CaptureReport,
+    radia_repeat_capture: &'a CaptureReport,
     control_signature: &'a str,
-    emitter_offscreen: bool,
     receiver_roi: ReceiverRoi,
     maximum_channel_delta: u8,
     mean_channel_delta: f64,
@@ -53,33 +52,20 @@ struct ManifestData<'a> {
 ///
 /// # Errors
 ///
-/// Returns capture, decode, control-mismatch, offscreen, or delta failures.
+/// Returns capture, decode, control-mismatch, or delta failures.
 pub fn capture_controlled_delta(config: &EvidenceConfig) -> Result<EvidenceReport, RenderError> {
-    if config.width < 16 || config.height < 16 || config.samples == 0 {
+    if config.width < 16 || config.height < 16 {
         return Err(RenderError::InvalidConfig(
-            "evidence extent must be at least 16x16 and samples must be positive".to_owned(),
+            "evidence extent must be at least 16x16".to_owned(),
         ));
     }
-    fs::create_dir_all(&config.output_directory)?;
-    let off_path = config.output_directory.join("radia-off.png");
-    let radia_path = config.output_directory.join("radia-on.png");
-    let off_capture = capture_png(&CaptureConfig {
-        width: config.width,
-        height: config.height,
-        samples: config.samples,
-        mode: RadiaMode::Off,
-        output_path: off_path,
-    })?;
-    let radia_capture = capture_png(&CaptureConfig {
-        width: config.width,
-        height: config.height,
-        samples: config.samples,
-        mode: RadiaMode::Radia,
-        output_path: radia_path,
-    })?;
+    let (off_capture, radia_capture, radia_repeat_capture) = capture_set(config)?;
     if off_capture.adapter_name != radia_capture.adapter_name
+        || off_capture.adapter_name != radia_repeat_capture.adapter_name
         || off_capture.backend != radia_capture.backend
+        || off_capture.backend != radia_repeat_capture.backend
         || off_capture.driver != radia_capture.driver
+        || off_capture.driver != radia_repeat_capture.driver
     {
         return Err(RenderError::InvalidConfig(
             "controlled captures used different GPU adapters or drivers".to_owned(),
@@ -95,23 +81,22 @@ pub fn capture_controlled_delta(config: &EvidenceConfig) -> Result<EvidenceRepor
             "receiver, direct-light, depth, or emitter controls changed".to_owned(),
         ));
     }
-    let emitter_offscreen = emitter_is_offscreen(off_settings, config.width, config.height)?;
-    if !emitter_offscreen {
-        return Err(RenderError::InvalidConfig(
-            "emitter intersects the camera frustum".to_owned(),
-        ));
-    }
-
     let (off_width, off_height, off_pixels) = decode_rgba8(&off_capture.output_path)?;
     let (radia_width, radia_height, radia_pixels) = decode_rgba8(&radia_capture.output_path)?;
+    let (repeat_width, repeat_height, repeat_pixels) =
+        decode_rgba8(&radia_repeat_capture.output_path)?;
     if off_width != config.width
         || off_height != config.height
         || radia_width != config.width
         || radia_height != config.height
+        || repeat_width != config.width
+        || repeat_height != config.height
         || off_pixels.len() != radia_pixels.len()
+        || radia_pixels != repeat_pixels
+        || radia_capture.sha256 != radia_repeat_capture.sha256
     {
         return Err(RenderError::InvalidConfig(
-            "decoded evidence extent or byte length differs".to_owned(),
+            "decoded evidence extent, byte length, or fixed-state RADIA output differs".to_owned(),
         ));
     }
     let receiver_roi = ReceiverRoi {
@@ -126,8 +111,8 @@ pub fn capture_controlled_delta(config: &EvidenceConfig) -> Result<EvidenceRepor
         config,
         off_capture: &off_capture,
         radia_capture: &radia_capture,
+        radia_repeat_capture: &radia_repeat_capture,
         control_signature: &off_signature,
-        emitter_offscreen,
         receiver_roi,
         maximum_channel_delta,
         mean_channel_delta,
@@ -141,30 +126,66 @@ pub fn capture_controlled_delta(config: &EvidenceConfig) -> Result<EvidenceRepor
     Ok(EvidenceReport {
         off_capture,
         radia_capture,
+        radia_repeat_capture,
         manifest_path,
         receiver_roi,
         maximum_channel_delta,
         mean_channel_delta,
         changed_pixels,
         control_signature: off_signature,
-        emitter_offscreen,
+        light_count: 3,
     })
+}
+
+fn capture_set(
+    config: &EvidenceConfig,
+) -> Result<(CaptureReport, CaptureReport, CaptureReport), RenderError> {
+    fs::create_dir_all(&config.output_directory)?;
+    let capture = |name: &str, mode| {
+        capture_png(&CaptureConfig {
+            width: config.width,
+            height: config.height,
+            mode,
+            scene_time_seconds: 0.0,
+            dragon_angle_radians: None,
+            output_path: config.output_directory.join(name),
+        })
+    };
+    Ok((
+        capture("radia-off.png", RadiaMode::Off)?,
+        capture("radia-on.png", RadiaMode::Radia)?,
+        capture("radia-on-repeat.png", RadiaMode::Radia)?,
+    ))
 }
 
 fn write_manifest(data: &ManifestData<'_>) -> Result<PathBuf, RenderError> {
     let manifest_path = data.config.output_directory.join("visual-evidence.tsv");
+    let settings = default_render_settings(RadiaMode::Radia)?;
+    let lights = settings
+        .lights
+        .iter()
+        .enumerate()
+        .map(|(index, light)| {
+            format!(
+                "{index}=({:.6},{:.6},{:.6};r={:.6})",
+                light.position.x, light.position.y, light.position.z, light.radius
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(";");
     let manifest = format!(
-        "field\tvalue\ncontract\tadr:deterministic-visual-evidence-contract\nbackend\t{}\nadapter\t{}\ndriver\t{}\nsize\t{}x{}\nsamples\t{}\nsequence\thammersley-cp-v1-1024\noff_sha256\t{}\nradia_sha256\t{}\ncontrol_signature\t{}\nemitter_offscreen\t{}\nreceiver_roi\t{},{},{},{}\nmaximum_channel_delta\t{}\nmean_channel_delta\t{:.6}\nchanged_pixels\t{}\nthreshold\t4\n",
+        "field\tvalue\ncontract\tadr:spatially-phased-and-edge-resolved-deferred-radia\nscene_presentation_contract\tadr:conservatively-disjoint-dragon-field-bounds\nudf_domain_contract\tadr:conservative-sampled-udf-domain-extension\nbackend\t{}\nadapter\t{}\ndriver\t{}\nsize\t{}x{}\nscene_time_seconds\t0\ncamera_vertical_fov_degrees\t65\ncamera_position\t0,3.0,2.3282032\ncamera_pitch_degrees\t-30\ndragon_origin_radius\t2.0\ndragon_materials\tcyan:r=0.2:m=1.0;magenta:r=0.65:m=0.0;yellow:r=0.9:m=0.0\ndirect_brdf\tggx-smith-schlick\nenvironment_fill\tanalytic-unoccluded-sky-ground\ngi_method\tscreen-space-irradiance-v3\ngather_taps\t32\nphase_tile\t4x4\nresolve_kernel\t5x5-edge-aware\ndragon_field_sha256\t{}\ndragon_count\t3\nlight_count\t3\nlights\t{}\noff_sha256\t{}\nradia_sha256\t{}\nradia_repeat_sha256\t{}\nfixed_state_hashes_match\ttrue\ncontrol_signature\t{}\nreceiver_roi\t{},{},{},{}\nmaximum_channel_delta\t{}\nmean_channel_delta\t{:.6}\nchanged_pixels\t{}\nthreshold\t4\n",
         data.off_capture.backend,
         data.off_capture.adapter_name,
         data.off_capture.driver,
         data.config.width,
         data.config.height,
-        data.config.samples,
+        DRAGON_FIELD_SHA256,
+        lights,
         data.off_capture.sha256,
         data.radia_capture.sha256,
+        data.radia_repeat_capture.sha256,
         data.control_signature,
-        data.emitter_offscreen,
         data.receiver_roi.left,
         data.receiver_roi.top,
         data.receiver_roi.right,
@@ -179,70 +200,38 @@ fn write_manifest(data: &ManifestData<'_>) -> Result<PathBuf, RenderError> {
 
 fn control_signature(settings: RenderSettings) -> String {
     let camera = settings.camera_to_world.to_gpu_xyzw();
-    let values = [
-        camera[0],
-        camera[1],
-        camera[2],
-        camera[3],
-        camera[4],
-        camera[5],
-        camera[6],
-        camera[7],
-        settings.emitter_position.x,
-        settings.emitter_position.y,
-        settings.emitter_position.z,
-        settings.emitter_radius,
-        settings.emitter_color.x,
-        settings.emitter_color.y,
-        settings.emitter_color.z,
-        settings.emitter_intensity,
+    let mut values = Vec::with_capacity(8 + settings.lights.len() * 8 + 4);
+    values.extend_from_slice(&camera);
+    for light in settings.lights {
+        values.extend_from_slice(&[
+            light.position.x,
+            light.position.y,
+            light.position.z,
+            light.radius,
+            light.color.x,
+            light.color.y,
+            light.color.z,
+            light.intensity,
+        ]);
+    }
+    values.extend_from_slice(&[
+        settings.vertical_fov,
+        settings.near,
         settings.maximum_distance,
         settings.hit_guard,
-    ];
-    let mut bytes = Vec::with_capacity(values.len() * 4 + 4);
+    ]);
+    let mut bytes =
+        Vec::with_capacity((values.len() + settings.dragons_to_world.len() * 8) * 4 + 4);
     for value in values {
         bytes.extend_from_slice(&value.to_bits().to_le_bytes());
     }
+    for dragon in settings.dragons_to_world {
+        for value in dragon.to_gpu_xyzw() {
+            bytes.extend_from_slice(&value.to_bits().to_le_bytes());
+        }
+    }
     bytes.extend_from_slice(&settings.maximum_steps.to_le_bytes());
     digest_hex(&bytes)
-}
-
-fn emitter_is_offscreen(
-    settings: RenderSettings,
-    width: u32,
-    height: u32,
-) -> Result<bool, RenderError> {
-    let aspect = f32::from(u16::try_from(width).map_err(|_| {
-        RenderError::InvalidConfig("evidence width exceeds exact projection range".to_owned())
-    })?) / f32::from(u16::try_from(height).map_err(|_| {
-        RenderError::InvalidConfig("evidence height exceeds exact projection range".to_owned())
-    })?);
-    let projection = ReverseZPerspective::new(std::f32::consts::FRAC_PI_3, aspect, 0.1)?;
-    let screen = projection.project_world(
-        settings.camera_to_world,
-        settings.emitter_position,
-        width,
-        height,
-    )?;
-    let camera_point = settings
-        .camera_to_world
-        .inverse()
-        .transform_point(settings.emitter_position);
-    if camera_point.z >= 0.0 {
-        return Ok(true);
-    }
-    let height_f32 = f32::from(u16::try_from(height).map_err(|_| {
-        RenderError::InvalidConfig("evidence height exceeds exact projection range".to_owned())
-    })?);
-    let projected_radius = settings.emitter_radius * height_f32
-        / (2.0 * (std::f32::consts::FRAC_PI_6).tan() * -camera_point.z);
-    let width_f32 = f32::from(u16::try_from(width).map_err(|_| {
-        RenderError::InvalidConfig("evidence width exceeds exact projection range".to_owned())
-    })?);
-    Ok(screen.position.x - projected_radius >= width_f32
-        || screen.position.x + projected_radius <= 0.0
-        || screen.position.y - projected_radius >= height_f32
-        || screen.position.y + projected_radius <= 0.0)
 }
 
 fn decode_rgba8(path: &PathBuf) -> Result<(u32, u32, Vec<u8>), RenderError> {

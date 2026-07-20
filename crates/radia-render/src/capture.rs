@@ -2,7 +2,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 
-use crate::renderer::{RadiaMode, RadiaRenderer, default_render_settings};
+use crate::renderer::{
+    RadiaMode, RadiaRenderer, apply_scene_motion, default_render_settings, dragon_triad_pose,
+    scene_cluster_phase,
+};
 use crate::sha256::digest_hex;
 use crate::{RenderError, block_on};
 
@@ -10,8 +13,9 @@ use crate::{RenderError, block_on};
 pub struct CaptureConfig {
     pub width: u32,
     pub height: u32,
-    pub samples: u32,
     pub mode: RadiaMode,
+    pub scene_time_seconds: f32,
+    pub dragon_angle_radians: Option<f32>,
     pub output_path: PathBuf,
 }
 
@@ -24,8 +28,9 @@ pub struct CaptureReport {
     pub driver: String,
     pub width: u32,
     pub height: u32,
-    pub samples: u32,
     pub mode: RadiaMode,
+    pub scene_time_seconds: f32,
+    pub dragon_angle_radians: f32,
 }
 
 /// Renders a deterministic offscreen image and writes an RGBA PNG.
@@ -46,7 +51,11 @@ pub fn capture_png(config: &CaptureConfig) -> Result<CaptureReport, RenderError>
         config.width,
         config.height,
     ))?;
-    let settings = default_render_settings(config.mode)?;
+    let mut settings = default_render_settings(config.mode)?;
+    apply_scene_motion(&mut settings, config.scene_time_seconds)?;
+    if let Some(angle_radians) = config.dragon_angle_radians {
+        settings.dragons_to_world = dragon_triad_pose(angle_radians)?;
+    }
     let output_texture = renderer.device().create_texture(&wgpu::TextureDescriptor {
         label: Some("radia-headless-output"),
         size: wgpu::Extent3d {
@@ -65,9 +74,7 @@ pub fn capture_png(config: &CaptureConfig) -> Result<CaptureReport, RenderError>
         label: Some("radia-headless-output-view"),
         ..Default::default()
     });
-    for _sample_index in 0..config.samples {
-        renderer.render_to_view(&output_view, settings)?;
-    }
+    renderer.render_to_view(&output_view, settings)?;
     let rgba = read_rgba8(&renderer, &output_texture, config.width, config.height)?;
     let png_bytes = encode_png(&rgba, config.width, config.height)?;
     if let Some(parent) = config.output_path.parent() {
@@ -83,8 +90,11 @@ pub fn capture_png(config: &CaptureConfig) -> Result<CaptureReport, RenderError>
         driver: adapter.driver.clone(),
         width: config.width,
         height: config.height,
-        samples: config.samples,
         mode: config.mode,
+        scene_time_seconds: config.scene_time_seconds,
+        dragon_angle_radians: config
+            .dragon_angle_radians
+            .unwrap_or(scene_cluster_phase(config.scene_time_seconds)?),
     })
 }
 
@@ -94,14 +104,22 @@ fn validate_capture_config(config: &CaptureConfig) -> Result<(), RenderError> {
             "capture width and height must be positive".to_owned(),
         ));
     }
-    if config.samples == 0 {
-        return Err(RenderError::InvalidConfig(
-            "capture sample count must be positive".to_owned(),
-        ));
-    }
     if config.output_path == Path::new("") {
         return Err(RenderError::InvalidConfig(
             "capture output path must not be empty".to_owned(),
+        ));
+    }
+    if config
+        .dragon_angle_radians
+        .is_some_and(|angle| !angle.is_finite())
+    {
+        return Err(RenderError::InvalidConfig(
+            "capture dragon angle must be finite".to_owned(),
+        ));
+    }
+    if !config.scene_time_seconds.is_finite() {
+        return Err(RenderError::InvalidConfig(
+            "capture scene time must be finite".to_owned(),
         ));
     }
     Ok(())
@@ -220,10 +238,29 @@ mod tests {
         let config = CaptureConfig {
             width: 0,
             height: 64,
-            samples: 1,
             mode: RadiaMode::Off,
+            scene_time_seconds: 0.0,
+            dragon_angle_radians: None,
             output_path: PathBuf::from("capture.png"),
         };
         assert!(capture_png(&config).is_err());
+        let non_finite = CaptureConfig {
+            width: 64,
+            height: 64,
+            mode: RadiaMode::Off,
+            scene_time_seconds: 0.0,
+            dragon_angle_radians: Some(f32::NAN),
+            output_path: PathBuf::from("capture.png"),
+        };
+        assert!(capture_png(&non_finite).is_err());
+        let non_finite_time = CaptureConfig {
+            width: 64,
+            height: 64,
+            mode: RadiaMode::Off,
+            scene_time_seconds: f32::INFINITY,
+            dragon_angle_radians: None,
+            output_path: PathBuf::from("capture.png"),
+        };
+        assert!(capture_png(&non_finite_time).is_err());
     }
 }

@@ -1,0 +1,131 @@
+{
+  "baseline": {
+    "camera": "right-handed active pose; -30 degree +X quaternion; translation=(0,3.0,2.3282032) meters; forward targets (0,-1,-4.6); vertical FOV=65 degrees",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=1; mode=Radia; 640x360; scene_time_seconds=0; three disjoint dragon fields; three analytic lights",
+    "dimensions": {
+      "height": 360,
+      "width": 640
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 0,
+      "tick": "scene-time-0"
+    },
+    "path": "radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/separated-pbr-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "983ef738ef5f7729577fca16de908ca00e45636ebfabdf25c8be4cbc0adaef77",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "candidate": {
+    "camera": "right-handed active pose; -30 degree +X quaternion; translation=(0,3.0,2.3282032) meters; forward targets (0,-1,-4.6); vertical FOV=65 degrees",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "run=2; mode=Radia; 640x360; scene_time_seconds=0; three disjoint dragon fields; three analytic lights",
+    "dimensions": {
+      "height": 360,
+      "width": 640
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 0,
+      "tick": "scene-time-0"
+    },
+    "path": "radia-on-repeat.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/separated-pbr-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "983ef738ef5f7729577fca16de908ca00e45636ebfabdf25c8be4cbc0adaef77",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "comparison": {
+    "absoluteTolerance": 0.0,
+    "channels": [
+      {
+        "baselineChannel": "R",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "R",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "G",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "G",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "B",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "B",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      },
+      {
+        "baselineChannel": "A",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "A",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      }
+    ],
+    "comparedPixels": 230400,
+    "differingPixels": 0,
+    "differingRatio": 0.0,
+    "maskPath": null,
+    "maxDifferingPixels": 0,
+    "maxDifferingRatio": 0.0,
+    "mismatchBounds": null,
+    "mode": "exact",
+    "nonFinite": "reject",
+    "relativeTolerance": 0.0
+  },
+  "decodedSampleEquality": true,
+  "evidenceId": "radia-separated-pbr-triad-determinism-rtx4070",
+  "fileHashEquality": true,
+  "policy": {
+    "classification": "public",
+    "transmission": "allowed"
+  },
+  "purpose": "acceptance",
+  "schemaVersion": "1.0",
+  "verdict": "pass"
+}

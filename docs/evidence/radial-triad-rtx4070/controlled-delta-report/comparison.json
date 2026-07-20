@@ -1,0 +1,136 @@
+{
+  "baseline": {
+    "camera": "right-handed active pose; identity rotation; translation=(0,0.15,0.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "mode=Off; 640x360; scene_time_seconds=0; triad and all three lights fixed",
+    "dimensions": {
+      "height": 360,
+      "width": 640
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 0,
+      "tick": "scene-time-0"
+    },
+    "path": "radia-off.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/radial-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "4884a7d25b4cd7ec09eac6780d352e8146b6ca42e2ed31b0ce570a2c8cbf2da6",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "candidate": {
+    "camera": "right-handed active pose; identity rotation; translation=(0,0.15,0.5) meters; forward=-Z",
+    "captureKind": "gpu-attachment",
+    "colorSpace": "srgb",
+    "configuration": "mode=Radia; 640x360; scene_time_seconds=0; only deterministic screen-space indirect enabled",
+    "dimensions": {
+      "height": 360,
+      "width": 640
+    },
+    "fallbackReason": null,
+    "format": "png",
+    "frame": {
+      "index": 0,
+      "tick": "scene-time-0"
+    },
+    "path": "radia-on.png",
+    "pixelFormat": "rgba8",
+    "reproductionCommand": "$env:RADIA_ADAPTER_NAME='NVIDIA'; cargo run -p radia-demo -- evidence --width 640 --height 360 --output-dir docs/evidence/radial-triad-rtx4070",
+    "revision": "WORKTREE",
+    "sha256": "dbfa5fd9172ea5f4e4a779d7a4b785648d09004dbfc55497294096238e428330",
+    "sourceTool": "radia-demo 0.1.0 evidence adapter",
+    "surface": "WGPU radia-headless-output render attachment",
+    "viewport": "640x360; top-left origin; pixel centers n+0.5"
+  },
+  "comparison": {
+    "absoluteTolerance": 0.0,
+    "channels": [
+      {
+        "baselineChannel": "R",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "R",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 62207,
+        "maximumAbsoluteDifference": 0.3254901960784313,
+        "meanAbsoluteDifference": 0.008081903594767324,
+        "rootMeanSquareDifference": 0.02120218459687573
+      },
+      {
+        "baselineChannel": "G",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "G",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 64382,
+        "maximumAbsoluteDifference": 0.403921568627451,
+        "meanAbsoluteDifference": 0.01325066380718498,
+        "rootMeanSquareDifference": 0.040038684190226916
+      },
+      {
+        "baselineChannel": "B",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "B",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 63207,
+        "maximumAbsoluteDifference": 0.3176470588235294,
+        "meanAbsoluteDifference": 0.011920206971675302,
+        "rootMeanSquareDifference": 0.03942827555767899
+      },
+      {
+        "baselineChannel": "A",
+        "baselineInfinite": 0,
+        "baselineNaN": 0,
+        "baselineSampleType": "u8",
+        "candidateChannel": "A",
+        "candidateInfinite": 0,
+        "candidateNaN": 0,
+        "candidateSampleType": "u8",
+        "differingSamples": 0,
+        "maximumAbsoluteDifference": 0.0,
+        "meanAbsoluteDifference": 0.0,
+        "rootMeanSquareDifference": 0.0
+      }
+    ],
+    "comparedPixels": 230400,
+    "differingPixels": 65080,
+    "differingRatio": 0.2824652777777778,
+    "maskPath": null,
+    "maxDifferingPixels": 230400,
+    "maxDifferingRatio": 1.0,
+    "mismatchBounds": {
+      "maximumX": 639,
+      "maximumY": 287,
+      "minimumX": 0,
+      "minimumY": 94
+    },
+    "mode": "tolerance",
+    "nonFinite": "reject",
+    "relativeTolerance": 0.0
+  },
+  "decodedSampleEquality": false,
+  "evidenceId": "radia-radial-triad-controlled-delta-rtx4070",
+  "fileHashEquality": false,
+  "policy": {
+    "classification": "public",
+    "transmission": "allowed"
+  },
+  "purpose": "acceptance",
+  "schemaVersion": "1.0",
+  "verdict": "pass"
+}

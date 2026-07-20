@@ -2,11 +2,12 @@ use std::error::Error;
 use std::fmt;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Instant;
 
 use radia_math::{ErrorScale, Vec3};
 use radia_render::{
-    CaptureConfig, EvidenceConfig, RadiaMode, RadiaRenderer, RenderError, RenderSettings, block_on,
-    capture_controlled_delta, capture_png, default_render_settings,
+    CaptureConfig, EvidenceConfig, RadiaMode, RadiaRenderer, RenderError, RenderSettings,
+    apply_scene_motion, block_on, capture_controlled_delta, capture_png, default_render_settings,
 };
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
@@ -80,8 +81,9 @@ fn parse_command(mut arguments: impl Iterator<Item = String>) -> Result<Command,
 
     let mut width = 640_u32;
     let mut height = 360_u32;
-    let mut samples = 64_u32;
     let mut mode = RadiaMode::Radia;
+    let mut scene_time_seconds = 0.0_f32;
+    let mut dragon_angle_radians = None;
     let mut output_path = PathBuf::from("Temp/captures/radia.png");
     while let Some(flag) = arguments.next() {
         let value = arguments.next().ok_or_else(|| {
@@ -90,8 +92,13 @@ fn parse_command(mut arguments: impl Iterator<Item = String>) -> Result<Command,
         match flag.as_str() {
             "--width" => width = parse_u32("width", &value)?,
             "--height" => height = parse_u32("height", &value)?,
-            "--samples" => samples = parse_u32("samples", &value)?,
             "--mode" => mode = parse_mode(&value)?,
+            "--scene-time-seconds" => {
+                scene_time_seconds = parse_f32("scene time", &value)?;
+            }
+            "--dragon-angle-degrees" => {
+                dragon_angle_radians = Some(parse_f32("dragon angle", &value)?.to_radians());
+            }
             "--output" => output_path = PathBuf::from(value),
             _ => {
                 return Err(DemoError::Arguments(format!(
@@ -103,8 +110,9 @@ fn parse_command(mut arguments: impl Iterator<Item = String>) -> Result<Command,
     Ok(Command::Capture(CaptureConfig {
         width,
         height,
-        samples,
         mode,
+        scene_time_seconds,
+        dragon_angle_radians,
         output_path,
     }))
 }
@@ -114,7 +122,6 @@ fn parse_evidence_command(
 ) -> Result<Command, DemoError> {
     let mut width = 320_u32;
     let mut height = 180_u32;
-    let mut samples = 1024_u32;
     let mut output_directory = PathBuf::from("Temp/evidence");
     while let Some(flag) = arguments.next() {
         let value = arguments.next().ok_or_else(|| {
@@ -123,7 +130,6 @@ fn parse_evidence_command(
         match flag.as_str() {
             "--width" => width = parse_u32("width", &value)?,
             "--height" => height = parse_u32("height", &value)?,
-            "--samples" => samples = parse_u32("samples", &value)?,
             "--output-dir" => output_directory = PathBuf::from(value),
             _ => {
                 return Err(DemoError::Arguments(format!(
@@ -135,7 +141,6 @@ fn parse_evidence_command(
     Ok(Command::Evidence(EvidenceConfig {
         width,
         height,
-        samples,
         output_directory,
     }))
 }
@@ -144,6 +149,18 @@ fn parse_u32(name: &str, value: &str) -> Result<u32, DemoError> {
     value
         .parse::<u32>()
         .map_err(|error| DemoError::Arguments(format!("invalid {name} '{value}': {error}")))
+}
+
+fn parse_f32(name: &str, value: &str) -> Result<f32, DemoError> {
+    let parsed = value
+        .parse::<f32>()
+        .map_err(|error| DemoError::Arguments(format!("invalid {name} '{value}': {error}")))?;
+    if !parsed.is_finite() {
+        return Err(DemoError::Arguments(format!(
+            "invalid {name} '{value}': value must be finite"
+        )));
+    }
+    Ok(parsed)
 }
 
 fn parse_mode(value: &str) -> Result<RadiaMode, DemoError> {
@@ -157,8 +174,12 @@ fn parse_mode(value: &str) -> Result<RadiaMode, DemoError> {
         "steps" => Ok(RadiaMode::StepCount),
         "hit" => Ok(RadiaMode::HitState),
         "triangle" => Ok(RadiaMode::Triangle),
+        "albedo" => Ok(RadiaMode::Albedo),
+        "emissive" => Ok(RadiaMode::Emissive),
+        "depth" => Ok(RadiaMode::LinearDepth),
+        "ao" => Ok(RadiaMode::AmbientOcclusion),
         _ => Err(DemoError::Arguments(format!(
-            "unknown mode '{value}'; expected triangle|off|radia|gi|sdf|primitive|normal|steps|hit"
+            "unknown mode '{value}'; expected triangle|off|radia|gi|albedo|normal|emissive|depth|ao|sdf|primitive|steps|hit"
         ))),
     }
 }
@@ -166,7 +187,7 @@ fn parse_mode(value: &str) -> Result<RadiaMode, DemoError> {
 fn run_capture(config: &CaptureConfig) -> Result<(), DemoError> {
     let report = capture_png(config)?;
     println!(
-        "capture={} sha256={} adapter={} backend={} driver={} size={}x{} samples={} mode={:?}",
+        "capture={} sha256={} adapter={} backend={} driver={} size={}x{} mode={:?} scene_time_seconds={} dragon_angle_radians={}",
         report.output_path.display(),
         report.sha256,
         report.adapter_name,
@@ -174,8 +195,9 @@ fn run_capture(config: &CaptureConfig) -> Result<(), DemoError> {
         report.driver,
         report.width,
         report.height,
-        report.samples,
-        report.mode
+        report.mode,
+        report.scene_time_seconds,
+        report.dragon_angle_radians
     );
     Ok(())
 }
@@ -183,12 +205,13 @@ fn run_capture(config: &CaptureConfig) -> Result<(), DemoError> {
 fn run_evidence(config: &EvidenceConfig) -> Result<(), DemoError> {
     let report = capture_controlled_delta(config)?;
     println!(
-        "evidence={} off_sha256={} radia_sha256={} control={} offscreen={} roi={},{},{},{} max_delta={} mean_delta={:.6} changed_pixels={}",
+        "evidence={} off_sha256={} radia_sha256={} repeat_sha256={} control={} lights={} roi={},{},{},{} max_delta={} mean_delta={:.6} changed_pixels={}",
         report.manifest_path.display(),
         report.off_capture.sha256,
         report.radia_capture.sha256,
+        report.radia_repeat_capture.sha256,
         report.control_signature,
-        report.emitter_offscreen,
+        report.light_count,
         report.receiver_roi.left,
         report.receiver_roi.top,
         report.receiver_roi.right,
@@ -225,13 +248,14 @@ struct RunningApplication {
     surface_config: wgpu::SurfaceConfiguration,
     renderer: RadiaRenderer,
     settings: RenderSettings,
+    started_at: Instant,
     suspended: bool,
 }
 
 impl RunningApplication {
     fn new(event_loop: &ActiveEventLoop) -> Result<Self, DemoError> {
         let attributes = Window::default_attributes()
-            .with_title("Radia - mode Triangle")
+            .with_title("Radia - Jade Dragon Triad - mode Radia")
             .with_inner_size(LogicalSize::new(1280.0, 720.0));
         let window = Arc::new(
             event_loop
@@ -260,13 +284,14 @@ impl RunningApplication {
         ))?;
         let surface_config = renderer.surface_configuration(&surface, size.width, size.height)?;
         surface.configure(renderer.device(), &surface_config);
-        let settings = default_render_settings(RadiaMode::Triangle)?;
+        let settings = default_render_settings(RadiaMode::Radia)?;
         Ok(Self {
             window,
             surface,
             surface_config,
             renderer,
             settings,
+            started_at: Instant::now(),
             suspended: false,
         })
     }
@@ -309,6 +334,7 @@ impl RunningApplication {
             label: Some("radia-surface-view"),
             ..Default::default()
         });
+        apply_scene_motion(&mut self.settings, self.started_at.elapsed().as_secs_f32())?;
         self.renderer.render_to_view(&view, self.settings)?;
         frame.present();
         Ok(())
@@ -316,9 +342,11 @@ impl RunningApplication {
 
     fn cycle_mode(&mut self) {
         self.settings.mode = self.settings.mode.next();
-        self.renderer.reset_history();
-        self.window
-            .set_title(&format!("Radia - mode {:?}", self.settings.mode));
+        self.renderer.reset_frame_sequence();
+        self.window.set_title(&format!(
+            "Radia - Jade Dragon Triad - mode {:?}",
+            self.settings.mode
+        ));
     }
 
     fn move_camera(&mut self, local_step: Vec3) -> Result<(), DemoError> {
@@ -331,7 +359,7 @@ impl RunningApplication {
             error_scale,
         )
         .map_err(RenderError::from)?;
-        self.renderer.reset_history();
+        self.renderer.reset_frame_sequence();
         Ok(())
     }
 }
@@ -379,7 +407,8 @@ impl ApplicationHandler for DemoApplication {
                         Ok(())
                     }
                     PhysicalKey::Code(KeyCode::KeyR) => {
-                        running.renderer.reset_history();
+                        running.started_at = Instant::now();
+                        running.renderer.reset_frame_sequence();
                         Ok(())
                     }
                     PhysicalKey::Code(KeyCode::KeyW) => {
@@ -431,7 +460,7 @@ impl DemoApplication {
 mod tests {
     use std::path::PathBuf;
 
-    use super::{Command, DemoError, parse_command};
+    use super::{Command, DemoError, parse_command, parse_mode};
 
     #[test]
     fn parses_headless_capture_contract() -> Result<(), DemoError> {
@@ -441,10 +470,12 @@ mod tests {
             "320",
             "--height",
             "180",
-            "--samples",
-            "8",
             "--mode",
-            "gi",
+            "ao",
+            "--scene-time-seconds",
+            "5.5",
+            "--dragon-angle-degrees",
+            "33",
             "--output",
             "out.png",
         ]
@@ -455,8 +486,50 @@ mod tests {
         };
         assert_eq!(config.width, 320);
         assert_eq!(config.height, 180);
-        assert_eq!(config.samples, 8);
+        assert_eq!(config.mode, radia_render::RadiaMode::AmbientOcclusion);
+        assert!((config.scene_time_seconds - 5.5).abs() <= f32::EPSILON);
+        let angle = config
+            .dragon_angle_radians
+            .ok_or_else(|| DemoError::Arguments("expected capture dragon angle".to_owned()))?;
+        assert!((angle - 33_f32.to_radians()).abs() <= f32::EPSILON * 4.0);
         assert_eq!(config.output_path, PathBuf::from("out.png"));
+        Ok(())
+    }
+
+    #[test]
+    fn scene_motion_updates_dragons_and_all_lights_from_elapsed_time() -> Result<(), DemoError> {
+        let start = radia_render::scene_motion(0.0)?;
+        let later = radia_render::scene_motion(1.0)?;
+        for index in 0..radia_render::DRAGON_COUNT {
+            assert_ne!(
+                start.dragons_to_world[index].translation(),
+                later.dragons_to_world[index].translation()
+            );
+            assert!(
+                start.dragons_to_world[index]
+                    .rotation()
+                    .orientation_dot(later.dragons_to_world[index].rotation())
+                    .abs()
+                    < 1.0
+            );
+        }
+        for index in 0..radia_render::LIGHT_COUNT {
+            assert_ne!(start.lights[index].position, later.lights[index].position);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn parses_every_human_readable_buffer_mode() -> Result<(), DemoError> {
+        for (name, expected) in [
+            ("albedo", radia_render::RadiaMode::Albedo),
+            ("normal", radia_render::RadiaMode::Normal),
+            ("emissive", radia_render::RadiaMode::Emissive),
+            ("depth", radia_render::RadiaMode::LinearDepth),
+            ("ao", radia_render::RadiaMode::AmbientOcclusion),
+        ] {
+            assert_eq!(parse_mode(name)?, expected);
+        }
         Ok(())
     }
 }

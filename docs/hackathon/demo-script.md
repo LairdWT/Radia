@@ -1,6 +1,6 @@
 # Build Week demo plan
 
-Target length: 2 minutes 35 seconds. The final upload must be a public YouTube
+Target length: 2 minutes 40 seconds. The final upload must be a public YouTube
 video under three minutes with spoken coverage of the project, Codex, and
 GPT-5.6.
 
@@ -19,28 +19,59 @@ GPT-5.6.
 - Explain that vectors still exist, but every rigid pose is a normalized dual
   quaternion and projection is analytic.
 
-## 0:45-1:05 - Renderer baseline
+## 0:45-1:10 - Jade dragon and three-light shadows
 
 - Launch `cargo run --release -p radia-demo`.
-- Show the rotating colored triangle.
-- Move the camera once, then press `Space` into the analytic courtyard.
+- Identify the three mesh-derived Stanford Chinese Dragon instances and the
+  red, green, and blue emissive sources.
+- Point out the 65-degree matrix-free camera: its normalized quaternion looks
+  down at the shared center by 30 degrees.
+- Point out the colored occlusion shadows, the three different light-orbit
+  speeds, and their different sine-wave vertical motions.
+- Show that the three tail sides point toward one center while all heads point
+  outward. Their 2.0 meter origins leave conservatively proven disjoint field
+  bounds, and the complete radial group turns slowly without breaking that layout.
+- Switch briefly to albedo to name the mid-value cyan, magenta, and yellow base
+  colors. State roughness `0.2`, `0.65`, and `0.9`; cyan alone is metallic 1.0.
+- State that the 871,306-triangle mesh is baked once into a deterministic 128
+  cubed unsigned-distance field and instanced by three normalized dual
+  quaternions; runtime poses and camera remain matrix-free.
 
-## 1:05-1:40 - RADIA off and on
+## 1:10-1:45 - Quaternion-first deferred RADIA
 
-- Show `Off`, then `Radia`, then `GiOnly`.
-- Explain the deterministic cosine-weighted sample, one emissive bounce, and
-  `RGBA16Float` running mean.
-- Cycle quickly through primitive ID, normal, step count, and trace state.
+- Begin in `Radia`, then press `Space` for direct-only `Off`, then `GiOnly`.
+- Explain the fixed G-buffer, direct-lighting, 32-tap spatially phased SSGI,
+  edge-aware composite, and presentation passes. World position is
+  reconstructed from reverse-Z depth and the camera dual quaternion without an
+  inverse-view or projection matrix.
+- Explain that guarded GGX handles direct material response. A deterministic
+  sky/ground environment term is only unoccluded baseline fill; RADIA remains
+  the separate current-frame, geometry-derived bounce approximation.
+- State that current RADIA has no path tracing, per-frame random sample,
+  temporal history, convergence grain, or learned denoiser. It gathers
+  current-frame direct radiance from guarded screen-space surfaces and resolves
+  it using current depth and normals.
+- Cycle through albedo, normal, bounded emissive, linear depth, and ambient
+  occlusion. State that normalized debug values bypass radiance tone mapping;
+  depth is camera distance over the trace interval and AO uses black for
+  occluded, white for open.
+- Continue through primitive ID, step count, and trace state. Point out that
+  production modes write depth only for hits, while the sampled UDF extends its
+  boundary field with a conservative lower bound. Together they remove the
+  former rotating black curtain; trace-only modes retain non-hit telemetry.
+- Show the rotating dual-quaternion triangle baseline, then return to `Radia`.
 
-## 1:40-2:05 - Off-screen emitter evidence
+## 1:45-2:10 - Controlled three-light evidence
 
-- Show the off/on raw PNGs or the controlled-delta contact sheet.
-- State that the emitter is analytically outside the camera frustum.
-- Show the recorded receiver result: threshold `4/255`, observed `100/255`,
-  8,653 changed ROI pixels.
-- Show the determinism comparison with zero decoded differences.
+- Show the fixed-state `Off` and `Radia` PNGs plus the TSV manifest.
+- State that camera, dragon digest, all three instance poses, all three lights,
+  explicit scene time, direct shadows, trace bounds, adapter, and gather taps
+  are fixed; only indirect mode changes.
+- Show the recorded ROI result: threshold `4/255`, observed `50/255`, and 3,846
+  changed subject-and-receiver pixels.
+- Show the repeated fixed-adapter hash match.
 
-## 2:05-2:35 - Codex, GPT-5.6, and handoff
+## 2:10-2:40 - Codex, GPT-5.6, and handoff
 
 - Show `docs/hackathon/build-log.tsv` and the dated commits.
 - Explain that Codex used AEP's GPT-5.6-developed math, Rust, WGPU, WGSL, and

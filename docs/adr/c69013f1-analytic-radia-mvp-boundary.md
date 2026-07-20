@@ -2,9 +2,9 @@
 id: c69013f1-d557-4949-b84b-dee10214f404
 slug: adr:analytic-radia-mvp-boundary
 title: Analytic RADIA MVP boundary
-status: accepted
+status: superseded
 supersedes: []
-supersededBy: null
+supersededBy: adr:mesh-derived-jade-dragon-lighting-scene
 deciders: ["LairdWT"]
 proposedAt: 2026-07-18
 decidedAt: 2026-07-18
