@@ -1,24 +1,22 @@
-# Owner-review Devpost update draft
+# Owner-review Devpost submission draft
 
 This is a local drafting aid for existing project `1345054`, **Agent Enhanced
-Projects (AEPs)**. On 2026-07-18 the owner authorized a remote project-page
-update. Devpost version 7 contains the verified quaternion-deferred dragon,
-buffer-inspection, conservative UDF curtain-fix, and banding-fix progress. That
-remote text was qualified as working-tree work at the time. The complete
-governed renderer, triad presentation, and evidence are now recorded in Radia
-commit `21234cfb19e7fd2b2d630ccff9b52df52685a577`. The project page reports
-`published`. No video was added and no hackathon submission operation was
-called.
+Projects (AEPs)**. The owner authorized the ordered publication workflow.
+Devpost version 8 now contains the public quaternion-deferred triad, current
+controlled-delta measurements, dual-adapter Vulkan results, and fresh-clone
+judge proof for Radia commit `c063b879418cf85092ace15a091a0d2e016206ee`.
+The project page reports `published`. No video was added and no hackathon
+submission operation was called.
 
 The Build Week host explicitly asks entrants to write the final project
-description in their own voice. Treat the text below as factual source material,
-rewrite it personally, review every claim, and only then approve an update.
+description in their own voice. The factual version 8 update is live; the owner
+must still review it personally and revise it in their own voice before final
+submission.
 
-## Published version 7 Radia source text
+## Version 8 Radia factual source text
 
-The following facts describe the governed Radia publication commit. An earlier
-subset was sent to Devpost version 7 with an explicit working-tree
-qualification.
+The following facts describe the governed Radia publication commit and support
+the live version 8 section.
 
 During Build Week I created Radia from a blank repository as a reproducible
 downstream test of AEP. Radia is a Rust 1.95/WGPU renderer that uses normalized
@@ -89,8 +87,7 @@ Do not call the submission operation until the owner has:
 2. selected submitter type and country;
 3. supplied the public YouTube URL;
 4. reviewed any replacement `links` and `built_with` arrays; and
-5. explicitly authorized the detailed remote update and, separately, final
-   submission.
+5. reviewed the live version 8 factual update in their own voice.
 
 Live deadline at the time of drafting: 2026-07-22 00:00 UTC (July 21 at 5:00
 PM Pacific Time). The project page reports `published`; the hackathon entry has
