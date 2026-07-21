@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "title": "OpenAI Build Week Radia demo",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps_numerator": 30,
+    "fps_denominator": 1
+  },
+  "normal_stop_ms": 160000,
+  "hard_stop_ms": 175000,
+  "cues": [
+    {
+      "at_ms": 0,
+      "scene": "Renderer",
+      "radia_commands": ["reset", "mode radia"],
+      "label": "RADIA"
+    },
+    {
+      "at_ms": 33000,
+      "scene": "AEP Proof",
+      "radia_commands": [],
+      "label": "AEP workflow"
+    },
+    {
+      "at_ms": 49000,
+      "scene": "Math Proof",
+      "radia_commands": [],
+      "label": "AEP-routed technical contract"
+    },
+    {
+      "at_ms": 64000,
+      "scene": "Renderer",
+      "radia_commands": ["reset", "mode radia"],
+      "label": "RADIA"
+    },
+    {
+      "at_ms": 79000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode off"],
+      "label": "Off: direct + ambient"
+    },
+    {
+      "at_ms": 82000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode gi"],
+      "label": "GiOnly: indirect contribution"
+    },
+    {
+      "at_ms": 85000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode albedo"],
+      "label": "Albedo: linear 0..1"
+    },
+    {
+      "at_ms": 88000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode normal"],
+      "label": "Normal: -1..1 mapped to 0..1"
+    },
+    {
+      "at_ms": 91000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode emissive"],
+      "label": "Emissive: bounded linear radiance"
+    },
+    {
+      "at_ms": 94000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode depth"],
+      "label": "Linear depth: trace range 0..1"
+    },
+    {
+      "at_ms": 96000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode ao"],
+      "label": "Accessibility: occluded 0, open 1"
+    },
+    {
+      "at_ms": 98000,
+      "scene": "Buffer Modes",
+      "radia_commands": ["mode radia"],
+      "label": "RADIA: deterministic current frame"
+    },
+    {
+      "at_ms": 100000,
+      "scene": "Evidence",
+      "radia_commands": [],
+      "label": "Controlled GPU evidence"
+    },
+    {
+      "at_ms": 120000,
+      "scene": "Closing",
+      "radia_commands": [],
+      "label": "Codex + GPT-5.6"
+    },
+    {
+      "at_ms": 152000,
+      "scene": "Renderer",
+      "radia_commands": ["mode radia"],
+      "label": "AEP is the tool. Radia is the proof."
+    }
+  ],
+  "narration_sections": [
+    {"at_ms": 0, "section": "thesis"},
+    {"at_ms": 33000, "section": "aep"},
+    {"at_ms": 49000, "section": "math"},
+    {"at_ms": 64000, "section": "scene"},
+    {"at_ms": 79000, "section": "radia"},
+    {"at_ms": 100000, "section": "evidence"},
+    {"at_ms": 120000, "section": "close"},
+    {"at_ms": 143000, "section": "final"}
+  ]
+}

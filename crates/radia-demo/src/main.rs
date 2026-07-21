@@ -1,7 +1,10 @@
 use std::error::Error;
 use std::fmt;
+use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::sync::mpsc::{self, Receiver, SyncSender, TryRecvError};
+use std::thread;
 use std::time::Instant;
 
 use radia_math::{ErrorScale, Vec3};
@@ -10,7 +13,7 @@ use radia_render::{
     apply_scene_motion, block_on, capture_controlled_delta, capture_png, default_render_settings,
 };
 use winit::application::ApplicationHandler;
-use winit::dpi::LogicalSize;
+use winit::dpi::{LogicalSize, PhysicalSize};
 use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
@@ -18,7 +21,7 @@ use winit::window::{Window, WindowId};
 
 fn main() -> Result<(), DemoError> {
     match parse_command(std::env::args().skip(1))? {
-        Command::Window => run_window(),
+        Command::Window(mode) => run_window(mode),
         Command::Capture(config) => run_capture(&config),
         Command::Evidence(config) => run_evidence(&config),
     }
@@ -31,6 +34,7 @@ enum DemoError {
     EventLoop(String),
     Window(String),
     Surface(String),
+    Control(String),
 }
 
 impl fmt::Display for DemoError {
@@ -41,6 +45,7 @@ impl fmt::Display for DemoError {
             Self::EventLoop(message) => write!(formatter, "event loop error: {message}"),
             Self::Window(message) => write!(formatter, "window error: {message}"),
             Self::Surface(message) => write!(formatter, "surface error: {message}"),
+            Self::Control(message) => write!(formatter, "control error: {message}"),
         }
     }
 }
@@ -61,21 +66,37 @@ impl From<RenderError> for DemoError {
 }
 
 enum Command {
-    Window,
+    Window(WindowMode),
     Capture(CaptureConfig),
     Evidence(EvidenceConfig),
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum WindowMode {
+    Interactive,
+    Presentation,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum PresentationCommand {
+    Mode(RadiaMode),
+    Reset,
+    Quit,
+}
+
 fn parse_command(mut arguments: impl Iterator<Item = String>) -> Result<Command, DemoError> {
     let Some(command) = arguments.next() else {
-        return Ok(Command::Window);
+        return Ok(Command::Window(WindowMode::Interactive));
     };
+    if command == "present" {
+        return parse_present_command(arguments);
+    }
     if command == "evidence" {
         return parse_evidence_command(arguments);
     }
     if command != "capture" {
         return Err(DemoError::Arguments(format!(
-            "unknown command '{command}'; expected 'capture', 'evidence', or no command"
+            "unknown command '{command}'; expected 'present', 'capture', 'evidence', or no command"
         )));
     }
 
@@ -115,6 +136,27 @@ fn parse_command(mut arguments: impl Iterator<Item = String>) -> Result<Command,
         dragon_angle_radians,
         output_path,
     }))
+}
+
+fn parse_present_command(
+    mut arguments: impl Iterator<Item = String>,
+) -> Result<Command, DemoError> {
+    let Some(flag) = arguments.next() else {
+        return Err(DemoError::Arguments(
+            "present requires --control-stdin".to_owned(),
+        ));
+    };
+    if flag != "--control-stdin" {
+        return Err(DemoError::Arguments(format!(
+            "unknown present flag '{flag}'; expected --control-stdin"
+        )));
+    }
+    if let Some(extra) = arguments.next() {
+        return Err(DemoError::Arguments(format!(
+            "unexpected present argument '{extra}'"
+        )));
+    }
+    Ok(Command::Window(WindowMode::Presentation))
 }
 
 fn parse_evidence_command(
@@ -184,6 +226,111 @@ fn parse_mode(value: &str) -> Result<RadiaMode, DemoError> {
     }
 }
 
+fn mode_name(mode: RadiaMode) -> &'static str {
+    match mode {
+        RadiaMode::Off => "off",
+        RadiaMode::Radia => "radia",
+        RadiaMode::GiOnly => "gi",
+        RadiaMode::SdfDistance => "sdf",
+        RadiaMode::PrimitiveId => "primitive",
+        RadiaMode::Normal => "normal",
+        RadiaMode::StepCount => "steps",
+        RadiaMode::HitState => "hit",
+        RadiaMode::Triangle => "triangle",
+        RadiaMode::Albedo => "albedo",
+        RadiaMode::Emissive => "emissive",
+        RadiaMode::LinearDepth => "depth",
+        RadiaMode::AmbientOcclusion => "ao",
+    }
+}
+
+fn parse_presentation_command(value: &str) -> Result<PresentationCommand, DemoError> {
+    let mut words = value.split_ascii_whitespace();
+    let Some(command) = words.next() else {
+        return Err(DemoError::Arguments(
+            "empty presentation command".to_owned(),
+        ));
+    };
+    match command {
+        "reset" => {
+            if let Some(extra) = words.next() {
+                return Err(DemoError::Arguments(format!(
+                    "reset does not accept '{extra}'"
+                )));
+            }
+            Ok(PresentationCommand::Reset)
+        }
+        "quit" => {
+            if let Some(extra) = words.next() {
+                return Err(DemoError::Arguments(format!(
+                    "quit does not accept '{extra}'"
+                )));
+            }
+            Ok(PresentationCommand::Quit)
+        }
+        "mode" => {
+            let Some(name) = words.next() else {
+                return Err(DemoError::Arguments("mode requires a mode name".to_owned()));
+            };
+            if let Some(extra) = words.next() {
+                return Err(DemoError::Arguments(format!(
+                    "mode does not accept trailing argument '{extra}'"
+                )));
+            }
+            Ok(PresentationCommand::Mode(parse_mode(name)?))
+        }
+        _ => Err(DemoError::Arguments(format!(
+            "unknown presentation command '{command}'"
+        ))),
+    }
+}
+
+fn emit_control_line(value: &str) -> Result<(), DemoError> {
+    let mut stdout = io::stdout().lock();
+    writeln!(stdout, "{value}")
+        .map_err(|error| DemoError::Control(format!("write stdout: {error}")))?;
+    stdout
+        .flush()
+        .map_err(|error| DemoError::Control(format!("flush stdout: {error}")))
+}
+
+fn read_presentation_commands(
+    reader: impl BufRead,
+    sender: &SyncSender<PresentationCommand>,
+) -> Result<(), DemoError> {
+    for line in reader.lines() {
+        let line = line.map_err(|error| DemoError::Control(format!("read stdin: {error}")))?;
+        let command = match parse_presentation_command(&line) {
+            Ok(command) => command,
+            Err(error) => {
+                emit_control_line(&format!("RADIA_CONTROL_ERROR message={error}"))?;
+                continue;
+            }
+        };
+        if sender.send(command).is_err() {
+            return Ok(());
+        }
+    }
+    let _send_result = sender.send(PresentationCommand::Quit);
+    Ok(())
+}
+
+fn spawn_presentation_reader() -> Result<Receiver<PresentationCommand>, DemoError> {
+    let (sender, receiver) = mpsc::sync_channel::<PresentationCommand>(16);
+    thread::Builder::new()
+        .name("radia-presentation-stdin".to_owned())
+        .spawn(move || {
+            let stdin = io::stdin();
+            if let Err(error) = read_presentation_commands(stdin.lock(), &sender) {
+                let _write_result =
+                    emit_control_line(&format!("RADIA_CONTROL_ERROR message={error}"));
+                let _send_result = sender.send(PresentationCommand::Quit);
+            }
+        })
+        .map_err(|error| DemoError::Control(format!("spawn stdin reader: {error}")))?;
+    Ok(receiver)
+}
+
 fn run_capture(config: &CaptureConfig) -> Result<(), DemoError> {
     let report = capture_png(config)?;
     println!(
@@ -223,10 +370,19 @@ fn run_evidence(config: &EvidenceConfig) -> Result<(), DemoError> {
     Ok(())
 }
 
-fn run_window() -> Result<(), DemoError> {
+fn run_window(mode: WindowMode) -> Result<(), DemoError> {
     let event_loop = EventLoop::new().map_err(|error| DemoError::EventLoop(error.to_string()))?;
     event_loop.set_control_flow(ControlFlow::Poll);
-    let mut application = DemoApplication::default();
+    let presentation_receiver = match mode {
+        WindowMode::Interactive => None,
+        WindowMode::Presentation => Some(spawn_presentation_reader()?),
+    };
+    let mut application = DemoApplication {
+        running: None,
+        failure: None,
+        presentation_receiver,
+        presentation: mode == WindowMode::Presentation,
+    };
     event_loop
         .run_app(&mut application)
         .map_err(|error| DemoError::EventLoop(error.to_string()))?;
@@ -236,10 +392,11 @@ fn run_window() -> Result<(), DemoError> {
     Ok(())
 }
 
-#[derive(Default)]
 struct DemoApplication {
     running: Option<RunningApplication>,
     failure: Option<String>,
+    presentation_receiver: Option<Receiver<PresentationCommand>>,
+    presentation: bool,
 }
 
 struct RunningApplication {
@@ -250,13 +407,22 @@ struct RunningApplication {
     settings: RenderSettings,
     started_at: Instant,
     suspended: bool,
+    presentation: bool,
 }
 
 impl RunningApplication {
-    fn new(event_loop: &ActiveEventLoop) -> Result<Self, DemoError> {
-        let attributes = Window::default_attributes()
-            .with_title("Radia - Jade Dragon Triad - mode Radia")
-            .with_inner_size(LogicalSize::new(1280.0, 720.0));
+    fn new(event_loop: &ActiveEventLoop, presentation: bool) -> Result<Self, DemoError> {
+        let title = if presentation {
+            "Radia - Jade Dragon Triad"
+        } else {
+            "Radia - Jade Dragon Triad - mode Radia"
+        };
+        let attributes = Window::default_attributes().with_title(title);
+        let attributes = if presentation {
+            attributes.with_inner_size(PhysicalSize::new(1280, 720))
+        } else {
+            attributes.with_inner_size(LogicalSize::new(1280.0, 720.0))
+        };
         let window = Arc::new(
             event_loop
                 .create_window(attributes)
@@ -285,6 +451,13 @@ impl RunningApplication {
         let surface_config = renderer.surface_configuration(&surface, size.width, size.height)?;
         surface.configure(renderer.device(), &surface_config);
         let settings = default_render_settings(RadiaMode::Radia)?;
+        if presentation {
+            let adapter = renderer.adapter_info();
+            emit_control_line(&format!(
+                "RADIA_READY adapter={} backend={:?} width={} height={}",
+                adapter.name, adapter.backend, size.width, size.height
+            ))?;
+        }
         Ok(Self {
             window,
             surface,
@@ -293,6 +466,7 @@ impl RunningApplication {
             settings,
             started_at: Instant::now(),
             suspended: false,
+            presentation,
         })
     }
 
@@ -343,10 +517,22 @@ impl RunningApplication {
     fn cycle_mode(&mut self) {
         self.settings.mode = self.settings.mode.next();
         self.renderer.reset_frame_sequence();
-        self.window.set_title(&format!(
-            "Radia - Jade Dragon Triad - mode {:?}",
-            self.settings.mode
-        ));
+        if !self.presentation {
+            self.window.set_title(&format!(
+                "Radia - Jade Dragon Triad - mode {:?}",
+                self.settings.mode
+            ));
+        }
+    }
+
+    fn set_mode(&mut self, mode: RadiaMode) {
+        self.settings.mode = mode;
+        self.renderer.reset_frame_sequence();
+    }
+
+    fn reset_animation(&mut self) {
+        self.started_at = Instant::now();
+        self.renderer.reset_frame_sequence();
     }
 
     fn move_camera(&mut self, local_step: Vec3) -> Result<(), DemoError> {
@@ -369,7 +555,7 @@ impl ApplicationHandler for DemoApplication {
         if self.running.is_some() {
             return;
         }
-        match RunningApplication::new(event_loop) {
+        match RunningApplication::new(event_loop, self.presentation) {
             Ok(running) => self.running = Some(running),
             Err(error) => self.stop_with_failure(event_loop, error.to_string()),
         }
@@ -407,8 +593,7 @@ impl ApplicationHandler for DemoApplication {
                         Ok(())
                     }
                     PhysicalKey::Code(KeyCode::KeyR) => {
-                        running.started_at = Instant::now();
-                        running.renderer.reset_frame_sequence();
+                        running.reset_animation();
                         Ok(())
                     }
                     PhysicalKey::Code(KeyCode::KeyW) => {
@@ -439,7 +624,8 @@ impl ApplicationHandler for DemoApplication {
         }
     }
 
-    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        self.process_presentation_commands(event_loop);
         if let Some(running) = &self.running
             && !running.suspended
         {
@@ -449,6 +635,45 @@ impl ApplicationHandler for DemoApplication {
 }
 
 impl DemoApplication {
+    fn process_presentation_commands(&mut self, event_loop: &ActiveEventLoop) {
+        loop {
+            let next = match self.presentation_receiver.as_ref() {
+                Some(receiver) => receiver.try_recv(),
+                None => return,
+            };
+            let command = match next {
+                Ok(command) => command,
+                Err(TryRecvError::Empty) => return,
+                Err(TryRecvError::Disconnected) => {
+                    event_loop.exit();
+                    return;
+                }
+            };
+            let Some(running) = self.running.as_mut() else {
+                return;
+            };
+            let result = match command {
+                PresentationCommand::Mode(mode) => {
+                    running.set_mode(mode);
+                    emit_control_line(&format!("RADIA_ACK mode={}", mode_name(mode)))
+                }
+                PresentationCommand::Reset => {
+                    running.reset_animation();
+                    emit_control_line("RADIA_ACK reset")
+                }
+                PresentationCommand::Quit => {
+                    let result = emit_control_line("RADIA_ACK quit");
+                    event_loop.exit();
+                    result
+                }
+            };
+            if let Err(error) = result {
+                self.stop_with_failure(event_loop, error.to_string());
+                return;
+            }
+        }
+    }
+
     fn stop_with_failure(&mut self, event_loop: &ActiveEventLoop, message: String) {
         eprintln!("Radia stopped: {message}");
         self.failure = Some(message);
@@ -458,9 +683,69 @@ impl DemoApplication {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Cursor;
     use std::path::PathBuf;
+    use std::sync::mpsc;
 
-    use super::{Command, DemoError, parse_command, parse_mode};
+    use super::{
+        Command, DemoError, PresentationCommand, WindowMode, parse_command, parse_mode,
+        parse_presentation_command, read_presentation_commands,
+    };
+
+    #[test]
+    fn parses_interactive_and_controlled_window_commands() -> Result<(), DemoError> {
+        let Command::Window(interactive) = parse_command(std::iter::empty())? else {
+            return Err(DemoError::Arguments("expected window command".to_owned()));
+        };
+        assert_eq!(interactive, WindowMode::Interactive);
+
+        let arguments = ["present", "--control-stdin"]
+            .into_iter()
+            .map(str::to_owned);
+        let Command::Window(presentation) = parse_command(arguments)? else {
+            return Err(DemoError::Arguments("expected present command".to_owned()));
+        };
+        assert_eq!(presentation, WindowMode::Presentation);
+        Ok(())
+    }
+
+    #[test]
+    fn parses_explicit_presentation_commands() -> Result<(), DemoError> {
+        assert_eq!(
+            parse_presentation_command("mode ao")?,
+            PresentationCommand::Mode(radia_render::RadiaMode::AmbientOcclusion)
+        );
+        assert_eq!(
+            parse_presentation_command("reset")?,
+            PresentationCommand::Reset
+        );
+        assert_eq!(
+            parse_presentation_command("quit")?,
+            PresentationCommand::Quit
+        );
+        assert!(parse_presentation_command("mode").is_err());
+        assert!(parse_presentation_command("mode radia extra").is_err());
+        assert!(parse_presentation_command("unknown").is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn stdin_reader_preserves_order_and_turns_eof_into_quit() -> Result<(), DemoError> {
+        let input = Cursor::new("reset\nmode depth\n");
+        let (sender, receiver) = mpsc::sync_channel::<PresentationCommand>(4);
+        read_presentation_commands(input, &sender)?;
+        drop(sender);
+        let commands: Vec<PresentationCommand> = receiver.into_iter().collect();
+        assert_eq!(
+            commands,
+            vec![
+                PresentationCommand::Reset,
+                PresentationCommand::Mode(radia_render::RadiaMode::LinearDepth),
+                PresentationCommand::Quit,
+            ]
+        );
+        Ok(())
+    }
 
     #[test]
     fn parses_headless_capture_contract() -> Result<(), DemoError> {

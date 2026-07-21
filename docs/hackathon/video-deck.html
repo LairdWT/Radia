@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radia Build Week proof deck</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #071019;
+      color: #edf7ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 16% 20%, #24475d 0, transparent 34%),
+        radial-gradient(circle at 84% 82%, #34234f 0, transparent 38%),
+        #071019;
+    }
+    main { width: 100%; height: 100%; padding: 82px 104px; }
+    .slide { display: none; width: 100%; height: 100%; }
+    .slide.active { display: grid; grid-template-rows: auto 1fr auto; gap: 44px; }
+    .eyebrow { color: #68dbff; font-size: 28px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    h1 { margin: 8px 0 0; font-size: 78px; line-height: 1.02; letter-spacing: -0.035em; }
+    h2 { margin: 0; font-size: 44px; line-height: 1.15; }
+    p, li { font-size: 32px; line-height: 1.38; }
+    ul { margin: 18px 0 0; padding-left: 34px; }
+    li { margin: 16px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: stretch; }
+    .card { padding: 36px 40px; border: 2px solid #33526a; border-radius: 24px; background: rgba(7, 16, 25, 0.78); }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
+    .flow .card { text-align: center; font-size: 34px; font-weight: 700; padding: 48px 20px; }
+    .arrow { color: #68dbff; font-size: 34px; }
+    .metric { font-size: 60px; font-weight: 800; color: #f7d765; }
+    .muted { color: #b7c9d8; }
+    .proof-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    figure { margin: 0; }
+    figure img { width: 100%; border: 2px solid #33526a; border-radius: 16px; image-rendering: auto; }
+    figcaption { margin-top: 8px; text-align: center; color: #b7c9d8; font-size: 24px; }
+    code { color: #8ce9ff; font-family: Consolas, monospace; }
+    footer { display: flex; justify-content: space-between; color: #9db4c5; font-size: 24px; }
+    .teleprompter .card { max-width: 1500px; }
+    .teleprompter h1 { font-size: 68px; }
+    .teleprompter li { font-size: 36px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="slide" data-slide="aep">
+    <header><div class="eyebrow">Agent Enhanced Projects</div><h1>Move project memory out of chat</h1></header>
+    <div class="grid">
+      <div class="card"><h2>Without durable governance</h2><ul><li>Decisions disappear between sessions</li><li>Standards drift across agents</li><li>Handoffs depend on model memory</li><li>Prompts and review work repeat</li></ul></div>
+      <div class="card"><h2>With AEP</h2><ul><li>The repository owns instructions and decisions</li><li>Standards and skills are version-pinned</li><li>Routers keep working context bounded</li><li>Deterministic gates produce evidence</li></ul></div>
+    </div>
+    <footer><span>Radia started from a blank public repository during Build Week.</span><span>AEP is the Developer Tools submission.</span></footer>
+  </section>
+
+  <section class="slide" data-slide="math">
+    <header><div class="eyebrow">AEP-routed implementation</div><h1>A decision became an enforceable contract</h1></header>
+    <div class="grid">
+      <div class="card"><h2>Routed inputs</h2><ul><li>Math: rotations, projection, robustness</li><li>Rust: invariants and property tests</li><li>WGPU: host and Vulkan lifecycle</li><li>WGSL: shader and layout contracts</li></ul></div>
+      <div class="card"><h2>Enforced outcome</h2><ul><li>Accepted coordinate and pose semantics</li><li>Normalized dual quaternions</li><li>Analytic reverse-Z projection</li><li>Matrix-ban gate: <span class="metric">0</span> findings</li></ul></div>
+    </div>
+    <footer><span>Vectors still represent points, directions, normals, and colors.</span><span>No model, view, projection, or inverse-view matrix.</span></footer>
+  </section>
+
+  <section class="slide" data-slide="evidence">
+    <header><div class="eyebrow">AEP evidence contract</div><h1>Claims require controlled, executable proof</h1></header>
+    <div class="grid">
+      <div class="proof-images">
+        <figure><img src="../evidence/separated-pbr-triad-rtx4070/radia-off.png" alt="Direct-only capture"><figcaption>Off</figcaption></figure>
+        <figure><img src="../evidence/separated-pbr-triad-rtx4070/radia-on.png" alt="RADIA capture"><figcaption>Radia</figcaption></figure>
+        <figure><img src="../evidence/separated-pbr-triad-rtx4070/controlled-delta-report/difference.png" alt="Decoded difference"><figcaption>Difference</figcaption></figure>
+      </div>
+      <div class="card"><h2>Fixed state, one mode delta</h2><ul><li>Required peak: <code>4/255</code></li><li>Observed peak: <span class="metric">50/255</span></li><li>Changed ROI pixels: <code>3,846</code></li><li>Repeated fixed-adapter PNG hashes match</li><li>36 CPU tests; Vulkan: RTX 4070 + Radeon 610M</li></ul></div>
+    </div>
+    <footer><span>Raw PNGs and manifests remain numeric authority.</span><span>The video presents evidence; it does not replace it.</span></footer>
+  </section>
+
+  <section class="slide" data-slide="close">
+    <header><div class="eyebrow">Agent development outcomes</div><h1>Less prompt management.<br>More durable proof.</h1></header>
+    <div class="grid">
+      <div class="card"><h2>Developer experience</h2><ul><li>Less repeated setup</li><li>Smaller working context</li><li>Quieter diagnostic logs</li><li>Explicit owner approval</li></ul></div>
+      <div class="card"><h2>Project results</h2><ul><li>Decisions survive sessions</li><li>Specialists stay bounded</li><li>Drift fails early</li><li>The same gates governed this local voice workflow</li></ul></div>
+    </div>
+    <footer><span>github.com/LairdWT/agent-enhanced-project</span><span>Developer Tools</span></footer>
+  </section>
+
+  <section class="slide teleprompter" data-slide="teleprompter">
+    <header><div class="eyebrow">Narration take</div><h1 id="prompt-title">Radia demo</h1></header>
+    <div class="card"><ul id="prompt-items"></ul></div>
+    <footer><span>Speak naturally; cover every item before the next cue.</span><span id="prompt-time"></span></footer>
+  </section>
+</main>
+<script>
+  const prompts = {
+    thesis: ["It is well known that Coding agents work quickly. However, they are prone to drift and repeating work. When user decisions live only in chat, those decisions disappear, standards drift, and users are forced to remind agents of lost decisions and context. Agent Enhanced Projects, or A E P, fixes that, by providing an extensible framework of decision schemas, plugins, skills, C L I tools, and hooks that can grow to fit the project needs."],
+    aep: ["A E P makes a repository executable. Instructions, decisions, specialist skills, handoffs, and verification gates are all enforced and maintained by Mechanical code that does not rely on agent dilligence and user vigilence."],
+    math: ["Skills are context efficient and smart loaded on demand. In the example project the lightweight skill routers load only the Rust, graphics, mathematics, and operations guidance each task needs, when they are needed."],
+    scene: ["Those contracts and initial user design and directives were solidified as the railway that built Radia's quaternion-first, matrix-free deferred renderer with realtime global illumination in just a single session."],
+    radia: ["In Radia, deterministic deferred lighting, real time shadows, indirect light, and human readable debug buffers make results inspectable and reviewable. These features were built using the A E P skills, plugin, and ADRs developed as the GPT 5.6 Sol agents worked on the project."],
+    evidence: ["When artifacts appeared, A E P required reproduction, measured fixes, and repeatable G P U evidence. The testing framework enforced by the A E P governance and hooks created human reviewable deliverables presented in session with the working GPT 5.6 agent."],
+    close: ["Codex with GPT-5.6 also used A E P to build this isolated voice project: recording consent, governing dependencies, testing conditioning, and generating this narration you're listening to right now. All using the A E P framework to create the text to speech project and produce the results you've seen and heard today."],
+    final: ["A E P is the Developer Tools submission, and this voice combined with the Radia rendering workflow are proof of its effectiveness."]
+  };
+  const params = new URLSearchParams(window.location.search);
+  const slideName = params.get("slide") || "aep";
+  const slide = document.querySelector(`[data-slide="${slideName}"]`) || document.querySelector('[data-slide="aep"]');
+  slide.classList.add("active");
+  if (slideName === "teleprompter") {
+    const section = params.get("section") || "thesis";
+    document.getElementById("prompt-title").textContent = section.charAt(0).toUpperCase() + section.slice(1);
+    document.getElementById("prompt-items").innerHTML = (prompts[section] || prompts.thesis).map(item => `<li>${item}</li>`).join("");
+    document.getElementById("prompt-time").textContent = params.get("time") || "";
+  }
+</script>
+</body>
+</html>

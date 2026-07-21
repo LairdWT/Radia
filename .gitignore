@@ -1,4 +1,5 @@
 Temp/
+.secrets/
 .venv/
 target/
 node_modules/

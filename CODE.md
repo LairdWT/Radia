@@ -8,13 +8,13 @@ INDEX.md); do not relitigate here.
 Library: agent-enhanced-project
 (install: git clone https://github.com/LairdWT/agent-enhanced-project)
 
-- rust @ plugins/rust/CONVENTIONS.md (v0.25.0)
-- graphics @ plugins/graphics/CONVENTIONS.md (v0.16.0)
+- rust @ plugins/rust/CONVENTIONS.md (v0.26.0)
+- graphics @ plugins/graphics/CONVENTIONS.md (v0.17.0)
 - math @ plugins/math/CONVENTIONS.md (v0.1.0)
-- git @ plugins/git/CONVENTIONS.md (v0.10.0)
-- ops @ plugins/ops/CONVENTIONS.md (v0.4.0)
-- powershell @ plugins/powershell/CONVENTIONS.md (v0.7.0)
-- shell @ plugins/shell/CONVENTIONS.md (v0.5.0)
+- git @ plugins/git/CONVENTIONS.md (v0.11.0)
+- ops @ plugins/ops/CONVENTIONS.md (v0.5.0)
+- powershell @ plugins/powershell/CONVENTIONS.md (v0.8.0)
+- shell @ plugins/shell/CONVENTIONS.md (v0.6.0)
 
 ## Project deviations and additions
 

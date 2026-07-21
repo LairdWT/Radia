@@ -16,6 +16,40 @@ projection matrices. Rigid poses are normalized dual quaternions and perspective
 projection is evaluated analytically. The repository gate rejects Rust `Mat*`
 types and WGSL `matNxM` types under project sources.
 
+## OpenAI Build Week judge guide
+
+Radia is the public, inspectable proof project for the **Agent Enhanced
+Projects (AEPs)** Developer Tools submission. AEP is the submitted product;
+Radia demonstrates what its rational guidance and mechanical enforcement can
+produce in one governed project.
+
+| Item | Link or value |
+|---|---|
+| Submitted project | [Agent Enhanced Projects (AEPs) on Devpost](https://devpost.com/software/agent-enhanced-projects-aeps) |
+| Public narrated demo | [YouTube, 2 minutes 40 seconds](https://youtu.be/A5QJKrxsUS4) |
+| AEP source | [LairdWT/agent-enhanced-project](https://github.com/LairdWT/agent-enhanced-project) (judge access is required while private) |
+| Public proof source | [LairdWT/Radia](https://github.com/LairdWT/Radia) |
+| Codex `/feedback` task | `019f75b8-db9b-77b3-87b3-d4870eb66651` |
+
+The fastest **no-build review** is to watch the public demo, compare the
+committed [`Off`](docs/evidence/separated-pbr-triad-rtx4070/radia-off.png) and
+[`Radia`](docs/evidence/separated-pbr-triad-rtx4070/radia-on.png) frames, inspect
+the human-readable [buffer views](docs/evidence/inspectable-buffers-rtx4070),
+and read the machine-checked
+[`controlled-delta-manifest.json`](docs/evidence/separated-pbr-triad-rtx4070/controlled-delta-manifest.json).
+That path reviews the shipped behavior and its provenance without installing a
+toolchain. It is artifact inspection, not a substitute for running the Vulkan
+renderer; the complete build and test path is under [Run it](#run-it).
+
+| Judging question | Evidence in this repository |
+|---|---|
+| Does it run and match the description? | [What is working](#what-is-working), [public demo](https://youtu.be/A5QJKrxsUS4), and [mechanical evidence](#mechanical-evidence) |
+| How do I install and test it? | [Requirements and quickstart](#run-it) plus [verification commands](#verification) |
+| Which platforms and sample data are supported? | [Requirements](#requirements) and [asset/license boundary](#license) |
+| How were AEP, Codex, and GPT-5.6 used? | [Governed development record](#how-aep-codex-and-gpt-56-were-used) and the [dated build log](docs/hackathon/build-log.tsv) |
+| What decisions shaped the result? | [Frozen contract](#frozen-math-and-rendering-contract) and [accepted ADR index](docs/adr/INDEX.md) |
+| What was prior work versus new work? | [Prior work and new work](#prior-work-and-new-work) |
+
 ## What is working
 
 - Rust 1.95, edition 2024, in a four-crate workspace.
@@ -70,6 +104,13 @@ post-MVP.
 - Windows 10/11 or Linux with a working Vulkan driver and Vulkan-capable GPU.
 - Rust 1.95.0. `rust-toolchain.toml` makes rustup select it automatically.
 - On Linux, the development packages required by your X11 or Wayland setup.
+- No account, API key, network service, or external sample download is needed
+  after cloning. The deterministic derived Dragon field is committed under
+  `assets/stanford-dragon`; its separate Stanford license is described below.
+
+The interactive renderer is supported on Windows and Linux only. It deliberately
+requests WGPU's Vulkan backend, so macOS, browser, DX12, and Metal execution are
+outside this reference project's v1 support boundary.
 
 Clone and verify:
 
@@ -324,22 +365,46 @@ secret, CI emits a notice instead of pretending that cross-repository access
 worked. The committed build log and fresh-clone rehearsal run those AEP checks
 locally against the exact pinned library.
 
-## How AEP and Codex were used
+## How AEP, Codex, and GPT-5.6 were used
 
 Radia began as a blank directory. AEP generated the repository contract,
 runtime-specific agent surfaces, accepted-ADR workflow, version pins, hooks,
 orchestration profiles, and GitHub gate. Only core routers are advertised at
 startup; topic spokes are loaded per unit of work.
 
-Codex then used those governed surfaces to:
+AEP addresses a recurring agent-development problem: prose instructions can be
+forgotten, reinterpreted, or allowed to drift during a long build. Its
+**rational layer** gives Codex focused skills, scoped agents, review doctrine,
+and context-aware routing. Its **mechanical layer** turns owner decisions into
+accepted ADRs, generated contracts, CLI checks, schemas, hooks, and evidence
+gates. Radia therefore records both why a decision was made and an executable
+way to detect important violations.
+
+Codex was the agent workspace and tool interface used throughout the Build Week
+session. GPT-5.6 Sol supplied the planning, coding, debugging, and review
+reasoning inside that workflow. AEP constrained both with the same accepted
+decisions and verification contracts. Together they:
 
 1. refresh and prove the installed AEP library before project work;
 2. scaffold the initial three-crate workspace, identify two routing gaps, and
    later add the dependency-free `radia-bake` tool under accepted ADRs;
 3. freeze conventions, dependencies, lineage, MVP scope, and evidence policy;
 4. derive and property-test the dual-quaternion and projection contracts;
-5. implement and validate WGPU/WGSL behavior on two Vulkan adapters; and
-6. produce reproducible, mechanically validated visual evidence.
+5. implement and validate Rust, WGPU, and WGSL behavior on two Vulkan adapters;
+6. diagnose visible tracing and banding defects from owner captures, amend the
+   governing decisions, and prove the fixes with deterministic captures;
+7. build the privacy-bounded OBS presentation controller and use a second
+   AEP-governed local project for consented, isolated text-to-speech work; and
+8. produce the public demo and reproducible, mechanically validated raw visual
+   evidence without treating the compressed video as numeric proof.
+
+Representative key decisions include normalized dual-quaternion rigid poses,
+analytic matrix-free reverse-Z projection, Vulkan-only WGPU execution, a
+deterministic current-frame deferred irradiance gather instead of path tracing,
+separate Stanford asset licensing, and raw-capture evidence remaining
+authoritative over presentation video. Those decisions and their rejected
+alternatives are reviewable in [`docs/adr`](docs/adr/INDEX.md), not hidden in
+chat history.
 
 The AEP math, Rust, WGPU, WGSL, planning, Git, and operations skill bundles used
 here were developed with Codex and GPT-5.6. Radia is their downstream stress
@@ -371,15 +436,118 @@ to be documented clearly.
 ## Hackathon handoff
 
 Radia is evidence for the existing AEP Devpost project, not a separate
-submission. The AEP project page now includes a verified public-Radia addendum;
-the detailed working-tree draft and required-field checklist are in
-[`docs/hackathon/devpost-update-draft.md`](docs/hackathon/devpost-update-draft.md).
-No hackathon submission or video upload is performed by this repository.
+submission. The owner uploaded the narrated demo and submitted OpenAI Build
+Week entry `1096888` on July 21, 2026 at 19:34:11 UTC. The live records are:
 
-The live deadline is July 21, 2026 at 5:00 PM Pacific Time, which is July 22 at
-00:00 UTC. The required public YouTube demo must be under three minutes and
-include audio covering the project, Codex, and GPT-5.6. A timed recording plan
-is in [`docs/hackathon/demo-script.md`](docs/hackathon/demo-script.md).
+- [Devpost project](https://devpost.com/software/agent-enhanced-projects-aeps)
+- [public YouTube demo](https://youtu.be/A5QJKrxsUS4)
+- [AEP source repository](https://github.com/LairdWT/agent-enhanced-project)
+- [public Radia proof repository](https://github.com/LairdWT/Radia)
+
+The detailed owner-reviewed field record and receipt are in
+[`docs/hackathon/devpost-update-draft.md`](docs/hackathon/devpost-update-draft.md).
+The repository automation never uploads media, mutates Devpost, or submits an
+entry; those remained explicit owner actions. The accepted public video is
+under three minutes and its narration covers AEP, Codex, and GPT-5.6. The timed
+recording source is in
+[`docs/hackathon/demo-script.md`](docs/hackathon/demo-script.md).
+
+### Repeatable OBS recording
+
+The Build Week presentation uses OBS 30.2.3 or newer with OBS WebSocket 5,
+PowerShell 7.4 or newer, and the committed 1080p30 timeline. Before using the
+controller, enable WebSocket authentication in OBS and rotate any password
+that existed before this workflow was installed. The password is requested as
+a secure prompt; never put it in a command line, repository file, or log.
+
+Run these commands from the repository root with OBS already open:
+
+```powershell
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Setup
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Narration
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action DryRun -NarrationPath <take.wav>
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Rehearse -NarrationPath <take.wav>
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Record -NarrationPath <take.wav>
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Validate -VideoPath <take.mp4>
+```
+
+An optional project-local synthetic narration workflow is available through
+`C:\LocalTTS`. It keeps managed Python, PyTorch CUDA libraries, caches, and the
+pinned Chatterbox model inside that directory; it does not install a system
+Python or CUDA Toolkit. Review the exact script in
+[`docs/hackathon/demo-script.md`](docs/hackathon/demo-script.md), then generate
+one unpadded, independently replaceable WAV per section:
+
+```powershell
+C:\LocalTTS\.venv\Scripts\local-tts.exe synthesize-sections `
+  C:\Radia\docs\hackathon\tts-narration.json `
+  --output-dir C:\Radia\Temp\build-week-video\tts-review\section-take-01 `
+  --reference-audio C:\LocalTTS\Temp\reference-voice\reference-a-128s.wav
+```
+
+Each WAV has a same-named editable `.txt` script. Add `--section <id>` to
+generate only selected sections while preserving original seeds and ordinal
+filenames. Pass `--scripts-dir <previous-take>` to synthesize hand-edited text
+into a new empty take directory. The final owner-approved take is a composite
+of the eight reviewed files, not a new single-pass synthesis. Its section
+hashes and measured durations are frozen in
+[`voice-selection.json`](docs/hackathon/voice-selection.json), and its local
+assembly provenance records the exact offsets and output hash.
+
+The selected 160-second composite is the only media input used by the final
+OBS sequence:
+
+```powershell
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action DryRun `
+  -NarrationPath C:\Radia\Temp\build-week-video\final-narration-01\aep-radia-narration.wav
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Rehearse `
+  -NarrationPath C:\Radia\Temp\build-week-video\final-narration-01\aep-radia-narration.wav
+pwsh -NoProfile -File scripts/record-devpost-demo.ps1 -Action Record `
+  -NarrationPath C:\Radia\Temp\build-week-video\final-narration-01\aep-radia-narration.wav
+```
+
+The assembled mono PCM WAV is exactly 160 seconds, explicitly marked as
+synthetic, and Chatterbox-watermarked. Owner approval of all eight source WAVs
+is recorded separately from final video acceptance.
+
+The owner selected review candidate 1. Full synthesis reuses that candidate's
+underlying consented ten-second reference, `reference-a-128s.wav`, rather than
+conditioning on the generated candidate WAV. LocalTTS was itself scaffolded
+and governed with AEP: its decisions record consent and isolated dependencies,
+its adapter bounds reference conditioning, and its tests and provenance gate
+the output. The demo names this voice work as a second AEP proof alongside
+Radia. [`voice-selection.json`](docs/hackathon/voice-selection.json) records the
+selected hashes, settings, timing basis, and still-closed approval gates without
+publishing the source voice recording or a private path.
+
+`Setup` provisions only the `Radia Build Week` profile and collection. It
+refuses unexpected objects with reserved names, never edits or deletes the
+existing `Untitled` configuration, uses window and local browser sources only,
+and restores the previously active profile and collection. The final mix mutes
+desktop audio and uses only the selected narration take. Recording is MKV for
+crash recovery, followed by automatic MP4 remux.
+
+The automated sequence is Renderer, AEP Proof, Math Proof, Renderer, Buffer
+Modes (`Off`, `GiOnly`, `Albedo`, `Normal`, `Emissive`, `LinearDepth`, and
+`AmbientOcclusion`), Evidence, Closing, and a final uninterrupted Renderer
+shot. The controller talks to `radia-demo` through acknowledged stdin commands;
+it does not inject keyboard or mouse input. The public proof deck is
+[`docs/hackathon/video-deck.html`](docs/hackathon/video-deck.html), and the
+machine-validated schedule is
+[`docs/hackathon/video-timeline.json`](docs/hackathon/video-timeline.json).
+
+If rehearsal or recording aborts, keep the MKV, read the reported failed cue,
+confirm OBS WebSocket is authenticated, confirm the Radia window is visible,
+and run `DryRun` again before retrying. An aborted take does not overwrite an
+earlier take. `Record` writes hashes, versions, adapter identity, timing, OBS
+statistics, and reproduction command beneath `Temp/build-week-video/`.
+
+The submitted take passed owner review for intelligible audio, readable buffer
+labels, privacy-safe cards, an artifact-free final shot, and a duration below
+three minutes. Any replacement take must pass those gates again before the
+owner changes YouTube or Devpost. The controller never uploads, mutates
+Devpost, or substitutes compressed video for the authoritative raw GPU
+evidence.
 
 ## License
 

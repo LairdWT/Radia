@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "approvedAt": "2026-07-21",
+  "purpose": "owner-approved AEP Build Week narration voice",
+  "engine": {
+    "name": "chatterbox-classic",
+    "packageVersion": "0.1.7",
+    "modelRevision": "5bb1f6ee58e50c3b8d408bc82a6d3740c2db6e18"
+  },
+  "selection": {
+    "candidate": 1,
+    "reviewOutputSha256": "0d5a3b23cf7a37e7bf1622eaa4e41da6458471141fc540b4f0a148da79bf8798",
+    "referenceWavSha256": "a582abaac44b058aefc1a7d5fea0181cf140928b22e122933a838516d880406c",
+    "reviewTextWords": 40,
+    "reviewDurationMs": 18600,
+    "settings": {
+      "seed": 20260721,
+      "exaggeration": 0.4,
+      "cfgWeight": 0.3,
+      "temperature": 0.75
+    }
+  },
+  "script": {
+    "sections": 8,
+    "words": 332,
+    "timelineDurationMs": 160000,
+    "approvedSectionDurationsMs": [32280, 15400, 14520, 14000, 19320, 18760, 21640, 8960],
+    "approvedSectionSha256": [
+      "4702d866f675595dab4a2e1c50c2cda9c443ea6558418195744a67ef99d5d551",
+      "b6d21160b62957ae135121c4bab4e69269f0a50646c5d150bb8ed31f2b177997",
+      "69971f68de27d9bb29411b61fa80c5266cfb9ea349c9782948b356cda490593d",
+      "3b0e2089967a4c6b902e269ab7fa4c713a050f09f08e63af5092fef89dfaa486",
+      "93d38e80ad7e6dd9e20f3c9fe191a3fec3efffd7c658d920d3ce837a2249b28e",
+      "560552e6cf5321f0f1bb0abc27283127d85135e49e81b31a7e6717385011ca1a",
+      "e1b8a00801be6188afe9ade01e818dc8e0df14be65216cf3ce9c00626931825c",
+      "c58216402aae470b39a926c56dd007b478365d1275328657895c149f0107462f"
+    ]
+  },
+  "governance": {
+    "consentRecorded": true,
+    "projectLocalRuntime": true,
+    "referenceHashRecorded": true,
+    "watermarkedOutput": true,
+    "fullNarrationApproved": true,
+    "obsRecordingApproved": true
+  }
+}

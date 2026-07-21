@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "title": "AEP Build Week narrated Radia proof",
+  "durationMs": 160000,
+  "sampleRate": 24000,
+  "syntheticSpeech": true,
+  "engine": {
+    "name": "chatterbox-classic-0.1.7",
+    "seed": 20260721,
+    "exaggeration": 0.4,
+    "cfgWeight": 0.3,
+    "temperature": 0.75
+  },
+  "sections": [
+    {
+      "id": "thesis",
+      "startMs": 0,
+      "endMs": 33000,
+      "text": "It is well known that Coding agents work quickly. However, they are prone to drift and repeating work. When user decisions live only in chat, those decisions disappear, standards drift, and users are forced to remind agents of lost decisions and context. Agent Enhanced Projects, or A E P, fixes that, by providing an extensible framework of decision schemas, plugins, skills, C L I tools, and hooks that can grow to fit the project needs."
+    },
+    {
+      "id": "aep",
+      "startMs": 33000,
+      "endMs": 49000,
+      "text": "A E P makes a repository executable. Instructions, decisions, specialist skills, handoffs, and verification gates are all enforced and maintained by Mechanical code that does not rely on agent dilligence and user vigilence."
+    },
+    {
+      "id": "math",
+      "startMs": 49000,
+      "endMs": 64000,
+      "text": "Skills are context efficient and smart loaded on demand. In the example project the lightweight skill routers load only the Rust, graphics, mathematics, and operations guidance each task needs, when they are needed."
+    },
+    {
+      "id": "scene",
+      "startMs": 64000,
+      "endMs": 79000,
+      "text": "Those contracts and initial user design and directives were solidified as the railway that built Radia's quaternion-first, matrix-free deferred renderer with realtime global illumination in just a single session."
+    },
+    {
+      "id": "radia",
+      "startMs": 79000,
+      "endMs": 100000,
+      "text": "In Radia, deterministic deferred lighting, real time shadows, indirect light, and human readable debug buffers make results inspectable and reviewable. These features were built using the A E P skills, plugin, and ADRs developed as the GPT 5.6 Sol agents worked on the project."
+    },
+    {
+      "id": "evidence",
+      "startMs": 100000,
+      "endMs": 120000,
+      "text": "When artifacts appeared, A E P required reproduction, measured fixes, and repeatable G P U evidence. The testing framework enforced by the A E P governance and hooks created human reviewable deliverables presented in session with the working GPT 5.6 agent."
+    },
+    {
+      "id": "close",
+      "startMs": 120000,
+      "endMs": 143000,
+      "text": "Codex with GPT-5.6 also used A E P to build this isolated voice project: recording consent, governing dependencies, testing conditioning, and generating this narration you're listening to right now. All using the A E P framework to create the text to speech project and produce the results you've seen and heard today."
+    },
+    {
+      "id": "final",
+      "startMs": 143000,
+      "endMs": 160000,
+      "text": "A E P is the Developer Tools submission, and this voice combined with the Radia rendering workflow are proof of its effectiveness."
+    }
+  ]
+}

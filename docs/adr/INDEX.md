@@ -1,6 +1,7 @@
 # ADR Index
 
 ## Accepted
+- [adr:obs-build-week-recording-automation](6f6bc4ff-obs-build-week-recording-automation.md) - OBS Build Week recording automation
 - [adr:conservatively-disjoint-dragon-field-bounds](4c297497-conservatively-disjoint-dragon-field-bounds.md) - Conservatively disjoint dragon field bounds
 - [adr:conservative-sampled-udf-domain-extension](66e0ab2f-conservative-sampled-udf-domain-extension.md) - Conservative sampled UDF domain extension
 - [adr:spatially-phased-and-edge-resolved-deferred-radia](68a21f2b-spatially-phased-and-edge-resolved-deferred-radia.md) - Spatially phased and edge-resolved deferred RADIA
